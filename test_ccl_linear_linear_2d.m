@@ -68,7 +68,7 @@ model.w = [];
 model.phi = @(x)fn_basis_linear ( x );
 
 % train the model
-model = learn_ccl(Xtr,Ytr,model); fp = @(x)predict_linear(x,model);
+model = learn_ccl_pi(Xtr,Ytr,model); fp = @(x)predict_linear(x,model);
 
 % predict training data
 Fptr = fp(Xtr);
