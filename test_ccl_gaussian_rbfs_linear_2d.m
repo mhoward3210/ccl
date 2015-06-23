@@ -33,7 +33,7 @@ for n=1:Ntr
 end
 Dtr.X = Xtr; Dtr.Y = Ytr; Dtr.N = Ntr;
 Dtr.F = Ftr; Dtr.A = Atr; Dtr.P = Ptr;
-save_data_ccl(['data/D_tr_',mfilename],Dtr);
+save_data_ccl(['D_tr_',mfilename],Dtr);
 end
 fprintf(1,'#Data (train): %5d, ',Ntr);   
 % generate test data
