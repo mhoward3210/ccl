@@ -1,15 +1,12 @@
-% Function for null space projection learning predictions
+% Project a vector onto the image space of a learnt projection 
 %
-% in:
-%     F       - function outputs (before projection)
-%     model   - model, containing fields
-%          .t - angle
-%          .A - constraint matrix
-%          .P - projection matrix
+% input
+%     F: input vector before projection
+%     model: learnt model for nullspace projection, containing fields
+%          .P: learnt projection matrix
 %
-% out:
-%     Y       - function outputs, projected by model
+% output
+%     Yp: the resulting vector after projection 
 %
-function Yp = predict_lprj(F,model)
-
-Yp = model.P*F;
+function Yp = predict_ccl_N(F,model)
+  Yp = model.P*F;
