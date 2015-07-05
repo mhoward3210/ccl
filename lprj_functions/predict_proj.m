@@ -8,5 +8,5 @@
 % output
 %     Yp: the resulting vector after projection 
 %
-function Yp = predict_ccl_N(F,model)
+function Yp = predict_proj (F,model)
   Yp = model.P*F;
