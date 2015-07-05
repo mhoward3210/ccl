@@ -1,4 +1,4 @@
-{
+%{
 Compute the normalised projected policy error. This error measures the 
 difference between the policy subject to the true constraints, and that of 
 the policy subject to the estimated constraints.
