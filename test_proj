@@ -72,7 +72,7 @@ catch
 end
 
 % ============= learn the projection matrix ===============================
-model = learn_nhat_fast (Ytr);    
+model = learn_nhat (Ytr);    
 
 fprintf(1,'True projection:\n w =\n'),      disp(P)
 fprintf(1,'Estimated projection:\n wp =\n'),disp(model.P)
