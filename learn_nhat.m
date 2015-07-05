@@ -98,3 +98,25 @@ function search = generate_search_space (search)
     search.alpha    = alpha ;
     search.interval = list(2,dim_t)-list(1,dim_t) ;
 end
+
+function alpha = get_unit_vector (theta)    
+       
+    dim_t   = length(theta) ;      
+    alpha   = zeros(1,dim_t+1) ; 
+    
+    alpha(1) = cos(theta(1)) ;    
+    
+   
+    for i =2:dim_t %dim_t:-1:2
+        alpha(i) = cos(theta(i)) ;        
+        for k = 1:i-1 % i:dim_t
+            alpha(i) = alpha(i) * sin(theta(k)) ;        
+        end                   
+    end
+    
+    alpha(dim_t+1)    = 1 ;    
+    for k = 1:dim_t            
+        alpha(dim_t+1) = alpha(dim_t+1) * sin(theta(k)) ;    
+    end        
+end
+
