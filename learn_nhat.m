@@ -1,93 +1,100 @@
-function [optimal, details] = learn_nhat (Pi, Un)
-      
-    [dim_u, dim_n]   = size(Un) ;       
+function [optimal, result] = learn_nhat (Un)
     
-    details.var_pi  = sum(var(Pi,1,2));
-    details.var_un  = sum(var(Un,1,2)) ;
-    details.dim_u   = dim_u ;
-    details.dim_n   = dim_n ;            
-        
-    settings.num_theta  = 180 ;
-    settings.dim_u      = dim_u ;
-    settings.dim_t      = dim_u-1 ;
-    settings.dim_n      = dim_n ;
+    % setup parameters for search
+    search.dim_u    = size(Un,1) ;          % dimensionality of the action space        
+    search.dim_n    = size(Un,2) ;          % number of data points      
+    search.num_theta= 180 ;                 % number of candidate constraints (from 0 to pi)
+    search.dim_t    = search.dim_u - 1 ;    % number of parameters needed to represent an unit vector
+    search.epsilon  = search.dim_u * 0.001 ;    
+    search          = generate_search_space (search) ;       
     
-    % generate the search space (save running time)
-    fprintf('Generating search space....') ;
-    search          = generate_search_space (settings) ;   
-    fprintf('Done! \n') ;
-    search.dim_n    = dim_n ;
-    search.dim_u    = dim_u ;
+    % vectorises the matrix  
+    Vn = zeros(search.dim_n, search.dim_u^2) ;  
+    for n = 1:search.dim_n
+        UnUn    = Un(:,n)*Un(:,n)' ;
+        Vn(n,:) = UnUn(:)' ;     
+    end   
+   
+    % search the first constraint
+    result.model{1} = search_first_alpha (Vn, Un, [], search) ;  
+    optimal         = result.model{1} ;
     
-    init_model.theta = [] ;
-    init_model.alpha = [] ;
-    
-    fprintf('Search alpha_1 \n') ;
-    [result.model{1} result.det{1}] = search_alpha (Un, init_model, search, 1) ;    
-    optimal.error   = result.model{1}.nMSE ;
-    optimal.alpha   = result.model{1}.alpha ;
-    optimal.P       = result.model{1}.P ;
-        
-    for alpha_id = 2:search.dim_t
-        fprintf('Search alpha_%d \n', alpha_id) ;
-        [result.model{alpha_id} result.det{alpha_id}] = search_alpha (Un, result.model{alpha_id-1}, search, alpha_id) ;        
-        if result.model{alpha_id}.nMSE < .001
-            optimal.error   = result.model{alpha_id}.nMSE ;
-            optimal.alpha   = result.model{alpha_id}.alpha ;
-            optimal.P       = result.model{alpha_id}.P ;        
-        else
-          %  optimal.error   = details.model{alpha_id-1}.nMSE ;
-          %  optimal.alpha   = details.model{alpha_id-1}.alpha ;
-          %  optimal.P       = details.model{alpha_id-1}.P ;
-            % stop if adding another constraint yields higher error
-            % return
-        end 
+    % search the next constraint until the new constraint does not fit
+    for alpha_id = 2:search.dim_t   
+        result.model{alpha_id} = search_alpha (Vn, Un, result.model{alpha_id-1}, search) ;               
+        if result.model{alpha_id}.nmse_j < .1
+            optimal = result.model{alpha_id} ;            
+        else           
+            return ;
+        end             
     end   
 end
 
-
-function [model, details] = search_alpha (Un, model, search, alpha_id)
-   
-    for i = 1:search.dim_s      
-        alpha   = search.alpha{i} ;
-        if  is_orthogonal (model, alpha, alpha_id) 
-            alpha   = [model.alpha ; alpha] ;
-            pinvAA  = pinv(alpha) * alpha ;
-            matrix  = search.I_u - pinvAA ;    
-            variance= norm(var( matrix*Un, 0, 2)) ;                          
-            for n = 1: search.dim_n
-               mse(n) = Un(:,n)' * pinvAA * Un(:,n) ;                              
-            end
-            details.var(i)  = variance ;         
-            details.uMSE(i) = sum(mse) ;
-            details.nMSE(i) = sum(mse) /variance ;
-        else
-            details.uMSE(i) = 1000000000 ;     
-            details.nMSE(i) = 1000000000 ;               
-        end
+function [model, stats] = search_first_alpha (V, Un, model, search)
+    for i = 1:search.dim_s               
+        alpha         = search.alpha{i} ;                   
+        AA            = pinv(alpha)*alpha ;
+        stats.umse(i) = sum ( V*AA(:) ) ;                   
     end    
-    [min_err, min_ind]  = min(details.nMSE) ;   
-    model.nMSE          = details.nMSE(min_ind) / search.dim_n ;             
-    model.uMSE          = details.uMSE(min_ind) / search.dim_n ;         
-    model.theta         = [ model.theta; search.theta{min_ind} ] ;
-    model.alpha         = [ model.alpha; search.alpha{min_ind} ] ;   
-    model.P             = search.I_u - pinv(model.alpha)*model.alpha ;    
+    [min_err, min_ind]  = min(stats.umse) ;       
+    model.theta         = search.theta{min_ind} ;
+    model.alpha         = search.alpha{min_ind} ;   
+    model.P             = search.I_u - pinv(model.alpha) * model.alpha ;
+    model.variance      = sum(var( model.P*Un, 0, 2)) ;     
+    model.umse_j        = stats.umse(min_ind) / search.dim_n ;          
+    model.nmse_j        = model.umse_j        / model.variance ;      
 end
 
-function orthogonal = is_orthogonal (model, alpha, alpha_id) 
-    for i = alpha_id-1:-1:1                    
-        if abs( model.alpha(i) * alpha' ) > 0.001            
-            orthogonal = 0 ;
-            return ;
+function [model, stats] = search_alpha (V, Un, model, search)
+ 
+    % for alpha_id > 1, check if alpha is orthogonal to the existing ones
+    for i = 1:search.dim_s               
+        abs_dot_product = abs ( model.alpha * search.alpha{i}' )  ; % dot product between this alpha and the previous one's
+        if sum(abs_dot_product > 0.001) > 0 % ignore alpha that is not orthogonal to any one of them            
+            stats.umse(i) = 1000000000 ;        
+        else             
+            alpha         = [model.alpha; search.alpha{i}] ;         
+            AA            = pinv(alpha)*alpha ;
+            stats.umse(i) = sum ( V*AA(:) ) ;                 
         end
-    end
-    orthogonal = 1 ;
+    end 
+    [min_err, min_ind]  = min(stats.umse) ;       
+    model.theta         = [ model.theta ; search.theta{min_ind} ] ;
+    model.alpha         = [ model.alpha ; search.alpha{min_ind} ] ;               
+    model.P             = search.I_u - pinv(model.alpha) * model.alpha ;
+    model.variance      = sum(var( model.P*Un, 0, 2)) ;     
+    model.umse_j        = stats.umse(min_ind) / search.dim_n ;          
+    model.nmse_j        = model.umse_j        / model.variance ;      
 end
 
-function model = get_optimal (model, details, search) 
-    [min_err, min_ind]  = min(details.error(1,:)) ;              
-    model.theta         = details.theta{min_ind} ;    
-    model.alpha         = get_unit_vector([model.theta]) ;
-    model.error         = min_err ;
-    model.P             = eye(search.dim_u) - (model.alpha)' * (model.alpha * model.alpha')^(-1) *(model.alpha) ;
+
+function search = generate_search_space (search)   
+    search.min_theta    = zeros(1,search.dim_t) ;    
+    search.max_theta    = ( pi-(pi/search.num_theta) )*ones(1,search.dim_t) ;        
+    
+    num_theta  = search.num_theta ;
+    dim_u      = search.dim_u ;      
+    dim_t      = search.dim_t ;
+    dim_s      = num_theta ^ dim_t ;    
+    list       = zeros(dim_s, dim_t) ;
+    theta      = cell(1,dim_s) ;
+    alpha      = cell(1,dim_s) ;  
+      
+    for t = 1:dim_t
+        list_theta  = linspace(search.min_theta(t), search.max_theta(t), num_theta) ;          
+        list_theta  = repmat(list_theta,    num_theta^(dim_t-t), 1) ;
+        list(:,t)   = repmat(list_theta(:), num_theta^(t-1), 1) ;        
+    end
+         
+    % make list of alpha
+    for s = 1: dim_s   
+        theta{s} = list(s,:) ;
+        alpha{s} = get_unit_vector ( list(s,:) ) ;   
+    end      
+    search.list = list ;
+    search.I_u      = eye(dim_u) ;        
+    search.dim_s    = dim_s ;
+    search.theta    = theta ;
+    search.alpha    = alpha ;
+    search.interval = list(2,dim_t)-list(1,dim_t) ;
 end
