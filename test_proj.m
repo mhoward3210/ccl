@@ -78,7 +78,7 @@ fprintf(1,'True projection:\n w =\n'),      disp(P)
 fprintf(1,'Estimated projection:\n wp =\n'),disp(model.P)
 
 % make prediction
-fp   = @(f)predict_ccl_N (f,model); 
+fp   = @(f)predict_proj (f,model); 
 Yptr = fp(Ftr);
 Ypte = fp(Fte);
 Ypv  = fp(Fv) ;
