@@ -19,7 +19,7 @@ xmax    = ones(dimX,1); xmin=-xmax;             % range of data
 
 % generate training data
 try   % load data, if possible
-    Dtr=load_data_ccl(['func_lprj/data/D_tr_',mfilename]);
+    Dtr=load_data_ccl(['D_tr_',mfilename]);
     Xtr=Dtr.X; Ytr=Dtr.Y; Ntr=Dtr.N;
     Ftr=Dtr.F; Atr=Dtr.A; Ptr=Dtr.P;
       A = Dtr.A(:,:,1) ; P = Dtr.P(:,:,1) ;
@@ -37,13 +37,13 @@ catch
     size(Ptr)
     Dtr.X = Xtr; Dtr.Y = Ytr; Dtr.N = Ntr;
     Dtr.F = Ftr; Dtr.A = Atr; Dtr.P = Ptr;
-    save_data_ccl(['func_lprj/data/D_tr_',mfilename],Dtr);
+    save_data_ccl(['D_tr_',mfilename],Dtr);
 end
 fprintf(1,'#Data (train): %5d, ',Ntr);   
 
 % generate test data
 try
-    Dte=load_data_ccl(['func_lprj/data/D_te_',mfilename]);
+    Dte=load_data_ccl(['D_te_',mfilename]);
     Xte=Dte.X; Yte=Dte.Y; Nte=Dte.N;
     Fte=Dte.F; Ate=Dte.A; Pte=Dte.P;    
 catch
@@ -57,7 +57,7 @@ catch
     end
     Dte.X = Xte; Dte.Y = Yte; Dte.N = Nte;
     Dte.F = Fte; Dte.A = Ate; Dte.P = Pte;
-    save_data_ccl(['func_lprj/data/D_te_',mfilename],Dtr);
+    save_data_ccl(['D_te_',mfilename],Dtr);
 end
 fprintf(1,'#Data (test): %5d, ',Nte);   
 
@@ -72,13 +72,13 @@ catch
 end
 
 % ============= learn the projection matrix ===============================
-[model, detail] = learn_nhat(Ftr,Ytr);    
+model = learn_nhat_fast (Ytr);    
 
 fprintf(1,'True projection:\n w =\n'),      disp(P)
 fprintf(1,'Estimated projection:\n wp =\n'),disp(model.P)
 
 % make prediction
-fp   = @(f)predict_lprj(f,model); 
+fp   = @(f)predict_ccl_N (f,model); 
 Yptr = fp(Ftr);
 Ypte = fp(Fte);
 Ypv  = fp(Fv) ;
@@ -108,4 +108,4 @@ figure(figNo),clf,hold on,grid on,box on
     axis equal
          
 %clear figNo
-save(['func_lprj/learnt_model/',mfilename])
+save(['model_',mfilename])
