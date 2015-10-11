@@ -70,10 +70,10 @@ cmin = xmin-.1;
 Ngp  = 10; Nc = Ngp^dimX;
 [c1,c2] = ndgrid(linspace(cmin(1),cmax(1),Ngp),linspace(cmin(2),cmax(2),Ngp)); c = [c1(:),c2(:)]';
 s2   = 1.0;
-model.phi = @(x)fn_basis_gaussian_rbf ( x, c, s2 );
+model.phi = @(x)phi_gaussian_rbf ( x, c, s2 );
 
 % train the model
-model = learn_ccl(Xtr,Ytr,model); fp = @(x)predict_linear(x,model);
+model = learn_ccl_pi(Xtr,Ytr,model); fp = @(x)predict_linear(x,model);
 
 % predict training data
 Fptr = fp(Xtr);

@@ -71,7 +71,7 @@ Ngp  = 5; Nc = Ngp^dimX;
 [c1,c2] = ndgrid(linspace(cmin(1),cmax(1),Ngp),linspace(cmin(2),cmax(2),Ngp)); c = [c1(:),c2(:)]';
 s2 = .2;
 model.W   = @(x)fn_weight_normalised_gaussians( x, c, s2 );
-model.phi = @(x)fn_basis_linear( x );
+model.phi = @(x)phi_linear( x );
 
 % train the model
 model = learn_lwccl(Xtr,Ytr,model); fp = @(x)predict_local_linear(x,model);

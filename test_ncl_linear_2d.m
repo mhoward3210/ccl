@@ -43,13 +43,13 @@ catch
     Dtr.X = Xtr; Dtr.Y = Ytr; Dtr.N = Ntr;
     Dtr.F = Ftr; Dtr.A = Atr; Dtr.P = Ptr; 
     Dtr.NS = NStr ; Dtr.TS = TStr ;  
-    save_data_ccl(['data/D_tr_',mfilename],Dtr);
+    save_data_ccl(['D_tr_',mfilename],Dtr);
 end
 fprintf(1,'#Data (train): %5d, ',Ntr);   
 
 % generate test data
 try
-    Dte=load_data_ccl(['data/D_te_',mfilename]);
+    Dte=load_data_ccl(['D_te_',mfilename]);
     Xte=Dte.X; Yte=Dte.Y; Nte=Dte.N;
     Fte=Dte.F; Ate=Dte.A; Pte=Dte.P;
     NSte=Dte.NS ; TSte= Dte.TS ;
@@ -68,7 +68,7 @@ catch
     Dte.X = Xte ; Dte.Y = Yte; Dte.N = Nte;
     Dte.F = Fte ; Dte.A = Ate; Dte.P = Pte;    
     Dte.TS = TSte; Dte.NS = NSte ; 
-    save_data_ccl(['data/D_te_',mfilename],Dte);
+    save_data_ccl(['D_te_',mfilename],Dte);
 end
 fprintf(1,'#Data (test): %5d, ',Nte);   
     
@@ -86,7 +86,7 @@ end
 model.num_basis = 16 ;                                            % define the number of radial basis functions                      
 model.c     = generate_grid_centres (Xtr, model.num_basis) ;      % generate a grid of basis functions
 model.s2    = mean(mean(sqrt(distances(model.c, model.c))))^2 ;   % set the variance as the mean distance between centres   
-model.phi   = @(x)fn_basis_gaussian_rbf ( x, model.c, model.s2 ); % normalised Gaussian rbfs
+model.phi   = @(x)phi_gaussian_rbf ( x, model.c, model.s2 ); % normalised Gaussian rbfs
 
 % learn the nullspace component
 model       = learn_ncl (Xtr, Ytr, model) ;   % learn the model 

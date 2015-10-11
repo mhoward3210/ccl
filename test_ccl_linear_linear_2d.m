@@ -65,7 +65,7 @@ end
 
 % set up regression model
 model.w = [];
-model.phi = @(x)fn_basis_linear ( x );
+model.phi = @(x)phi_linear ( x );
 
 % train the model
 model = learn_ccl_pi(Xtr,Ytr,model); fp = @(x)predict_linear(x,model);
