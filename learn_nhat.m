@@ -103,10 +103,7 @@ function alpha = get_unit_vector (theta)
        
     dim_t   = length(theta) ;      
     alpha   = zeros(1,dim_t+1) ; 
-    
     alpha(1) = cos(theta(1)) ;    
-    
-   
     for i =2:dim_t %dim_t:-1:2
         alpha(i) = cos(theta(i)) ;        
         for k = 1:i-1 % i:dim_t
