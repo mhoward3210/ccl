@@ -11,7 +11,7 @@
 % Output
 %   optimal: a model for the projection matrix
 %   optimal.f_proj(q): a function that predicts N(q) given q
-function [optimal] = learn_alpha_ccl_sd (Un, X, options)
+function [optimal] = learn_alpha_ccl (Un, X, options)
 
     % essential parameters 
     model.dim_b     = options.dim_b ;   % dimensionality of the gaussian kernel basis
