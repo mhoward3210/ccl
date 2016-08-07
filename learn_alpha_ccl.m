@@ -95,7 +95,7 @@ end
 %   Output
 %       model:  updated model with the k^th constraint
 function model = search_alpha (BX, RnUn, model)
-    options.MaxFunEvals = 1e6 ;
+    %options.MaxFunEvals = 1e6 ;
     options.MaxIter     = 1000 ;
     options.TolFun      = 1e-6 ;
     options.TolX        = 1e-6 ;
@@ -203,13 +203,14 @@ function [xf, S, msg] = solve_lm (varargin)
     epsf = options.TolFun(:);
     
     % get function evaluation and jacobian at x
-    r   = FUN(x) ;
-    J   = finjac(FUN, r, x, epsx);
-    S   = r'*r;             % sum of squared error
+    %
+    r   = FUN(x) ;                  % E(x,b)
+    J   = finjac(FUN, r, x, epsx);  % dE(x,b)/db
+    S   = r'*r;                     % sum of squared error
   %  nfJ = 2;
-    A   = J.'*J;            % System matrix
+    A   = J.'*J;                    % System matrix
     v   = J.'*r;        
-    D   = diag(diag(A));    % automatic scaling
+    D   = diag(diag(A));            % automatic scaling
     for i = 1 : dim_x
         if D(i,i)==0, D(i,i)=1 ; end
     end
@@ -227,8 +228,8 @@ function [xf, S, msg] = solve_lm (varargin)
             any(abs(d) >= epsx) && ...      % d > minimum x tolerance    
             any(abs(r) >= epsf)             % r > minimum f(x) toleration
         
-     %   d  = (A+l*D)\v;            % negative solution increment
-        d   = pinv(A+l*D)*v ;
+        d  = (A+l*D)\v;            % negative solution increment d = (J'J+lambda*I)^(-1)*J'*(y-f(x,w))
+     %   d   = pinv(A+l*D)*v ;
         xd  = x-d;                  % the next x
 
         rd  = FUN(xd);              % residual error at xd
