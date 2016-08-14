@@ -1,7 +1,8 @@
 %% 
-% Learning state dependent projection matrix N(q) for problem with the form
-% Un = N(q) * F(q) where N is a state dependent projection matrix
-%                        F is some policy
+% Learning state independent selection matrix (Lambda) for problem with the form
+% Un = N(q) * F(q) where N(q) = I - pinv(A(q))A(q) is a state dependent projection matrix
+%                        A(q) = Lambda J(q)
+%                        F(q) is some policy
 % Input
 %   X:  state of the system
 %   Un: control of the system generated with the form Un(q) = N(q) * F(q)
@@ -11,29 +12,16 @@
 % Output
 %   optimal: a model for the projection matrix
 %   optimal.f_proj(q): a function that predicts N(q) given q
-function [optimal] = learn_alpha_ccl (Un, X, options)
+function [optimal] = learn_lambda_ccl (Un, X, J, options)
 
-    % essential parameters 
-    model.dim_b     = options.dim_b ;   % dimensionality of the gaussian kernel basis
+    
+    % essential parameters     
     model.dim_r     = options.dim_r ;   % dimensionality of the end effector
     model.dim_x     = size(X, 1) ;      % dimensionality of input
     model.dim_u     = size(Un,1) ;      % dimensionality of output Un = N(X) * F(X) where X
-    model.dim_t     = model.dim_u - 1 ; % dimensionality of each constraint parameters    
-    dim_n           = size(X,2) ;       % number of training points
+    model.dim_t     = model.dim_r - 1 ; % dimensionality of each constraint parameters    
+    model.dim_n     = size(X,2) ;       % number of training points
         
-    % choose a method for generating the centres for gaussian kernel. A
-    % grid centre is usually adequate for a 2D problem. For higher 
-    % dimensionality, kmeans centre normally performs better
-    if model.dim_x < 3
-        model.dim_b = floor(sqrt(model.dim_b))^2 ;
-        centres     = generate_grid_centres (X, model.dim_b) ;          % generate centres based on grid
-    else
-        centres     = generate_kmeans_centres (X, model.dim_b) ;        % generate centres based on K-means
-    end  
-    variance        = mean(mean(sqrt(distances(centres, centres))))^2 ; % set the variance as the mean distance between centres 
-    model.phi       = @(x) phi_gaussian_rbf ( x, centres, variance );   % gaussian kernel basis function    
-    BX              = model.phi(X) ;                                    % K(X)
-    
     optimal.nmse    = 10000000 ;        % initialise the first model
     model.var       = sum(var(Un,0,2)) ;% variance of Un
     
@@ -41,76 +29,66 @@ function [optimal] = learn_alpha_ccl (Un, X, options)
     % At the k^{th} each iteration, candidate constraint vectors are
     % rotated to the space orthogonal to the all ( i < k ) constraint
     % vectors. At the first iteration, Rn = identity matrix
-    Rn = cell(1,dim_n) ;
-    for n = 1 : dim_n       
-        Rn{n} = eye(model.dim_u) ;         
-    end    
-    
-    % The objective functions is E(Xn) = A(Xn) * Rn(Xn) * Un. For faster
-    % computation, RnUn(Xn) = Rn(Xn)*Un(Xn) is pre-caldulated to avoid
+    Vn= zeros(model.dim_r, model.dim_n) ;
+    for n = 1 : model.dim_n       
+        Vn(:,n) = J(X(:,n)) * Un(:,n) ;            
+    end 
+    Rn    = eye(model.dim_r) ;  
+    RnVn  = Vn ;
+    % The objective functions is E(Xn) = Lambda * Rn * Vn. 
+    % For faster computation, RnVn = Rn*Vn is pre-caldulated to avoid 
     % repeated calculation during non-linear optimisation. At the first iteration, the rotation matrix is the identity matrix, so RnUn = Un    
-    RnUn    = Un ;     
-        
-    Iu      = eye(model.dim_u) ;
+       
     for alpha_id = 1:model.dim_r        
         model.dim_k = alpha_id ;            
-        model       = search_alpha (BX, RnUn, model ) ;                                 % search the optimal k^(th) constraint vector
-        theta       = [pi/2*ones(dim_n, (alpha_id-1)), (model.w{alpha_id}* BX)' ] ;     % predict constraint parameters
-        for n = 1: dim_n                          
-            Rn{n}       = get_rotation_matrix (theta(n,:), Rn{n}, model, alpha_id) ;    % update rotation matrix for the next iteration                               
-            RnUn(:,n)   = Rn{n} * Un(:,n) ;                                             % rotate Un ahead for faster computation
-        end                 
+        model       = search_alpha (RnVn, model ) ;                                    % search the optimal k^(th) constraint vector
+        
         % if the k^(th) constraint vector reduce the fitness, then the
         % previously found vectors are enough to describe the constraint
         if (model.nmse > optimal.nmse) && (model.nmse > 1e-3)
             break ; 
-        else         
-            optimal   = model ;  
-        end             
+        else
+            model.lambda(model.dim_k,:)= get_unit_vector(model.theta(alpha_id,:)) * Rn ;
+            optimal     = model ;
+            Rn          = get_rotation_matrix (model.theta(alpha_id,:), Rn, model, alpha_id) ;  % update rotation matrix for the next iteration       
+            for n = 1: model.dim_n
+                RnVn(:,n)  = Rn * Vn(:,n) ;
+            end
+        end                   
     end
-    optimal.f_proj  =  @(q) predict_proj (optimal, q, Iu) ;  % a function to predict the projection matrix
+    optimal.f_proj  = @(q) predict_proj (q, optimal.lambda, J, eye(model.dim_u)) ;
     fprintf('\t Found %d constraint vectors with residual error = %4.2e\n', optimal.dim_k, optimal.nmse) ;
 end
 
 %% prediction of the projection matrix
 % Our model predicts the constraint parameters. this function is used to
 % reconstuct the projection matrix from constraint paramters.
-function N = predict_proj (model, q, Iu)
-    Rn = Iu ;                               % initial rotation
-    A  = zeros(model.dim_k, model.dim_u) ;  % Initial constraint matrix
-    bx = model.phi(q) ;                     % gaussian kernel of q    
-    for k = 1:model.dim_k
-        theta   = [ pi/2 * ones(1,k-1), (model.w{k} * bx )' ] ; % the kth constraint parameter                  
-        A(k,:)  = get_unit_vector_from_matrix(theta) *  Rn ;                % the kth constraint vector
-        Rn      = get_rotation_matrix (theta, Rn, model, k) ;   % update rotation matrix for (k+1)
-    end            
-    N = Iu - A'*A ;    
+function N = predict_proj (q, Lambda, J, Iu)
+    A = Lambda * J(q) ;        
+    N = Iu - pinv(A)*A ;
 end
 
 %% Learning the constraint vector
 %   Input
-%       BX:     higher dimensional representation of X using gaussian kernel
-%       RnUn:   RnUn=Rn*Un 
+%       V:      vec(Un*Un')
+%       Jn:     jacobian
 %       model:  model learnt from the last iteration
 %   Output
 %       model:  updated model with the k^th constraint
-function model = search_alpha (BX, RnUn, model)
-    %options.MaxFunEvals = 1e6 ;
-    options.MaxIter     = 1000 ;
+function model = search_alpha ( RnVn, model)
+    options.MaxIter     = 10000 ;
     options.TolFun      = 1e-6 ;
-    options.TolX        = 1e-6 ;
-    options.Jacobian    = 0 ;
-   
-    obj                 = @(W) obj_AUn (model, W, BX, RnUn) ;   % setup the learning objective function          
+    options.TolX        = 1e-6 ;   
+    obj                 = @(theta) obj_AVn (model, theta, RnVn) ;   % setup the learning objective function          
     model.nmse          = 10000000 ; 
     for i = 1:1 % normally, the 1 attempt is enough to find the solution. Repeat the process if the process tends to find local minimum (i.e., for i = 1:5) 
-        W    = rand(1, (model.dim_u-model.dim_k)* model.dim_b) ; % make a random guess for initial value                   
-        W    = solve_lm (obj, W, options );                      % use a non-linear optimiser to solve obj                   
-        nmse = mean(obj(W).^2) / model.var ;
+        theta = rand(1, model.dim_r-model.dim_k) ;  % make a random guess for initial value                   
+        theta = solve_lm (obj, theta, options );    % use a non-linear optimiser to solve obj                   
+        nmse  = mean(obj(theta).^2) / model.var ;
         fprintf('\t K=%d, iteration=%d, residual error=%4.2e\n', model.dim_k, i, nmse) ;
-        if model.nmse > nmse 
-            model.w{model.dim_k}= reshape(W, model.dim_u-model.dim_k, model.dim_b) ;    
-            model.nmse          = nmse ;            
+        if model.nmse > nmse               
+            model.nmse                 = nmse ;   
+            model.theta(model.dim_k,:) = [pi/2*ones(1, model.dim_k-1) theta] ;                 
         end
         if model.nmse < 1e-5 % restart a random initial weight if residual error is higher than 10^-5
             break
@@ -119,22 +97,21 @@ function model = search_alpha (BX, RnUn, model)
 end
 
 %% objective funtion: minimise (A * Un)^2
-function [fun] = obj_AUn (model, W, BX, RnUn)   
-    dim_n   = size(BX,2) ;    
-    W       = reshape(W, model.dim_u-model.dim_k, model.dim_b );    
+function [fun] = obj_AVn (model, W, RnVn)   
+    dim_n   = size(RnVn,2) ;    
     fun     = zeros(dim_n, 1) ;
-    theta   = [pi/2*ones(dim_n, (model.dim_k-1)), (W * BX)' ] ;   
-    alpha   = get_unit_vector_from_matrix(theta) ; 
+    theta   = [pi/2*ones(1, (model.dim_k-1)), W ] ;   
+    alpha   = get_unit_vector (theta) ;  
     for n   = 1 : dim_n                         
-        fun(n)  = alpha(n,:) * RnUn(:,n) ;            
+        fun(n)  = alpha * RnVn(:,n) ;            
     end           
 end
 
 %% calculate rotation matrix after finding the k^th constraint vector. The result is rotation matrix that rotate vectors into a space orthogonal to all constraint vectors
 function R = get_rotation_matrix(theta_k, current_Rn, search, alpha_id)
-    R = eye(search.dim_u) ;        
+    R = eye(search.dim_r) ;        
     for d = alpha_id : search.dim_t            
-        R = R * make_givens_matrix(search.dim_u, d, d+1, theta_k(d) )' ;
+        R = R * make_givens_matrix(search.dim_r, d, d+1, theta_k(d) )' ;
     end        
     R = R * current_Rn ;
 end
@@ -145,25 +122,6 @@ function G = make_givens_matrix(dim, i, j, theta)
     G(i,j) =-sin(theta) ;
     G(j,i) = sin(theta) ;
 end
-
-%% convert constraint parameters to constraint vectors
-function alpha = get_unit_vector_from_matrix (Theta)           
-    [dim_n dim_t]   = size(Theta) ;      
-    alpha           = zeros(dim_n,dim_t+1) ;     
-    alpha(:,1)      = cos(Theta(:,1)) ;            
-    for i =2:dim_t 
-        alpha(:,i) = cos(Theta(:,i)) ;  
-        
-        for k = 1:i-1
-            alpha(:,i) = alpha(:,i) .* sin(Theta(:,k)) ;        
-        end                   
-    end    
-    alpha(:,dim_t+1)    = ones(dim_n,1) ;    
-    for k = 1:dim_t            
-        alpha(:,dim_t+1) = alpha(:,dim_t+1) .* sin(Theta(:,k)) ;    
-    end        
-end
-
 
 %% Solve nonlinear least squared problem using Levenberg-Maquardt algoritm
 %
@@ -198,7 +156,7 @@ function [xf, S, msg] = solve_lm (varargin)
         if isfield(varargin{3}, 'TolX'), options.TolX = varargin{3}.TolX ;          end           
     end
     x    = xc(:);
-    dim_x   = length(x);
+    dim_x= length(x);
     epsx = options.TolX * ones(dim_x,1) ; 
     epsf = options.TolFun(:);
     
