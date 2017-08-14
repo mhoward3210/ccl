@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of learn_lwccl</title>
+  <meta name="keywords" content="learn_lwccl">
+  <meta name="description" content="model = learn_ccl(X,Y,model)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">learn_policy</a> &gt; learn_lwccl.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions\learn_policy&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>learn_lwccl
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>model = learn_ccl(X,Y,model)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function model = learn_lwccl(X,Y,model) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> model = learn_ccl(X,Y,model)
+
+ Learn null space policy using locally weighted regression (LWR)
+
+ Input:
+
+   X                               Input state data
+   Y                               Target data
+   model                           Model related parameters
+
+ Output:
+   model                           learnt model</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../Functions/demos/demo_2_link_arm.html" class="code" title="function demo_2_link_arm">demo_2_link_arm</a>	demo_2_link_arm</li><li><a href="../../Functions/demos/demo_toy_example_2D.html" class="code" title="function demo_toy_example_2D">demo_toy_example_2D</a>	demo_toy_example_2D</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function model = learn_lwccl(X,Y,model)</a>
+0002 <span class="comment">% model = learn_ccl(X,Y,model)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Learn null space policy using locally weighted regression (LWR)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Input:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   X                               Input state data</span>
+0009 <span class="comment">%   Y                               Target data</span>
+0010 <span class="comment">%   model                           Model related parameters</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Output:</span>
+0013 <span class="comment">%   model                           learnt model</span>
+0014 
+0015 <span class="comment">% CCL: A MATLAB library for Constraint Consistent Learning</span>
+0016 <span class="comment">% Copyright (C) 2007  Matthew Howard</span>
+0017 <span class="comment">% Contact: matthew.j.howard@kcl.ac.uk</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% This library is free software; you can redistribute it and/or</span>
+0020 <span class="comment">% modify it under the terms of the GNU Lesser General Public</span>
+0021 <span class="comment">% License as published by the Free Software Foundation; either</span>
+0022 <span class="comment">% version 2.1 of the License, or (at your option) any later version.</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% This library is distributed in the hope that it will be useful,</span>
+0025 <span class="comment">% but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+0026 <span class="comment">% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+0027 <span class="comment">% Lesser General Public License for more details.</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% You should have received a copy of the GNU Library General Public</span>
+0030 <span class="comment">% License along with this library; if not, write to the Free</span>
+0031 <span class="comment">% Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.</span>
+0032 
+0033 [dimY N] = size(Y);
+0034 
+0035 <span class="comment">% find normalised Y</span>
+0036 r = sum(Y.^2,1).^0.5;
+0037 YN = Y./repmat(r,dimY,1);
+0038 
+0039 <span class="comment">% find feature vectors</span>
+0040 Phi      = model.phi(X);
+0041 dimPhi   = size(Phi,1); <span class="comment">% get feature dimensionality</span>
+0042 
+0043 <span class="comment">% find weights</span>
+0044 W        = model.W(X);
+0045 Nc       = size(W,1);   <span class="comment">% get no. centres</span>
+0046 
+0047 <span class="comment">% train each local model</span>
+0048 <span class="keyword">for</span> nc=1:Nc
+0049     WPhi=repmat(W(nc,:),dimPhi,1).*Phi;
+0050     
+0051     <span class="comment">% construct Jacobian</span>
+0052     YPhit = Y*WPhi';
+0053     g = YPhit(:);
+0054     
+0055     <span class="comment">% construct Hessian</span>
+0056     H = zeros(dimY*dimPhi);
+0057     <span class="keyword">for</span> n=1:N
+0058         YNPhit = YN(:,n)*Phi(:,n)';
+0059         v(:,n) = YNPhit(:);
+0060         H = H + W(nc,n)*v(:,n)*v(:,n)';
+0061     <span class="keyword">end</span>
+0062     
+0063     <span class="comment">% do eigendecomposition for inversion</span>
+0064     <span class="comment">%[V,D] = eig(H+1e-6*eye(size(H)));</span>
+0065     [V,D] = eig(H);
+0066     ev = diag(D);
+0067     ind = find(ev&gt;1e-6);
+0068     V1=V(:,ind);
+0069     pinvH1 = V1*diag(ev(ind).^-1)*V1';
+0070     model.w(:,:,nc)=reshape(pinvH1*g,dimY,dimPhi)';
+0071 <span class="keyword">end</span>
+0072</pre></div>
+<hr><address>Generated on Mon 24-Jul-2017 16:09:11 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>
