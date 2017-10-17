@@ -6,6 +6,9 @@
 %   directory of the library has to be specified using the 
 %   bag2matlab_library_path variable
 % Subfunctions: bagInfo(), bagReader()
+%
+% Note: This script was only tested in Ubuntu, and it requires that ROS is
+% installed.
 
 % Author: Joao Moura
 % Edinburgh Centre for Robotics, Edinburgh, UK
@@ -51,3 +54,6 @@ for i=1:N_files % loop over all files_directory ROS bag files
     end
     disp('--------------------------------');
 end
+
+%% Remove bag2matlab library
+rmpath(bag2matlab_library_path);
