@@ -3,22 +3,24 @@
 % Extracts the data from all rosbag files in a given directory and saves
 % them as Matlab .mat files
 
-%% Add bag2matlab library
+%% User Input
 bag2matlab_library_path = '../bag2matlab';
+files_directory = './';
+
+%% Add bag2matlab library
 addpath(bag2matlab_library_path);
 
 %% Get rosbag file names:
-directory = './';
-file_names = dir(strcat(directory,'*.bag'));
+file_names = dir(strcat(files_directory,'*.bag'));
 if(isempty(file_names)) % test if specified direct
-    error(strcat('Error: No bag files found in ',directory));
+    error(strcat('Error: No bag files found in ',files_directory));
 end
-N_files = length(file_names); % number of bag files in directory
+N_files = length(file_names); % number of bag files in files_directory
 
 %% Loop to extract and save data
-for i=1:N_files % loop over all directory ros files
+for i=1:N_files % loop over all files_directory ros files
     name = file_names(i).name;
-    bag_file = strcat(directory,name);
+    bag_file = strcat(files_directory,name);
     topics = bagInfo(bag_file);
     if(isempty(topics)) % test if there are any topics
         warning(strcat('Warning: ROS bag file ',name,' has no topic!'));
