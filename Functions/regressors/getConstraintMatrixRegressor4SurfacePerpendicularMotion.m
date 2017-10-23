@@ -12,25 +12,25 @@ function functionHandle = getConstraintMatrixRegressor4SurfacePerpendicularMotio
 %    functionHandle - function to be evaluated 
 %
 % Example: 
-% % Robot Kinematic model specified by the Denavit-Hartenberg
-% DH = [0.0, 0.31, 0.0, pi/2;
-%       0.0, 0.0, 0.0, -pi/2;
-%       0.0, 0.4, 0.0, -pi/2;
-%       0.0, 0.0, 0.0, pi/2;
-%       0.0, 0.39, 0.0, pi/2;
-%       0.0, 0.0, 0.0, -pi/2;
-%       0.0, 0.21-0.132, 0.0, 0.0];
-% % Peters Cork robotics library has to be installed
-% robot = SerialLink(DH);
-% % Phi_A(x): vector of regressors for the Constraint matrix as a function
-% % of the state
-% n = [0; 0; 1];
-% W_A = blkdiag(n.', n.', n.'); % constant gain matrix for the Constraint matrix
-% Phi_A = getConstraintMatrixRegressor4SurfacePerpendicularMotion(robot);
-% % Constraint matrix as a function of configuration
-% A = @(x) W_A*Phi_A(x);
-% % Constraint matrix for given robot arm configuration
-% disp(A([0;0;0;pi/2;0;-pi/2;0]));
+%     % Robot Kinematic model specified by the Denavit-Hartenberg
+%     DH = [0.0, 0.31, 0.0, pi/2;
+%           0.0, 0.0, 0.0, -pi/2;
+%           0.0, 0.4, 0.0, -pi/2;
+%           0.0, 0.0, 0.0, pi/2;
+%           0.0, 0.39, 0.0, pi/2;
+%           0.0, 0.0, 0.0, -pi/2;
+%           0.0, 0.21-0.132, 0.0, 0.0];
+%     % Peters Cork robotics library has to be installed
+%     robot = SerialLink(DH);
+%     % Phi_A(x): vector of regressors for the Constraint matrix as a function
+%     % of the state
+%     n = [0; 0; 1];
+%     W_A = blkdiag(n.', n.', n.'); % constant gain matrix for the Constraint matrix
+%     PhiA = getConstraintMatrixRegressor4SurfacePerpendicularMotion(robot);
+%     % Constraint matrix as a function of configuration
+%     A = @(x) W_A*PhiA(x);
+%     % Constraint matrix for given robot arm configuration
+%     disp(A([0;0;0;pi/2;0;-pi/2;0]));
 %
 % Libraries required: Peter Corke's Robotics library (MatLab add-on)
 % 
