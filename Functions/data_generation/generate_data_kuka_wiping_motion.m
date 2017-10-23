@@ -57,7 +57,7 @@ robot = SerialLink(DH); % Peters Cork robotics library has to be installed
 Phi_A = getConstraintMatrixRegressor4SurfacePerpendicularMotion(robot);
 % Phi_b(x): vector of regressors for the main task as a function of the
 % state
-Phi_b = getTaskRegressors4SurfacePerpendicultaMotionSimulated(robot);
+Phi_b = getTaskRegressors4SurfacePerpendicularMotionSimulated(robot);
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 
