@@ -1,7 +1,7 @@
 function functionHandle = getClosedFormNullSpaceProjectionMatrixEstimatior(Phi_A, Phi_b, ConstraintDim)
     functionHandle = @ClosedFormNullSpaceProjectionMatrixEstimatior;
 
-    function nullSpaceProjectionHat = ClosedFormNullSpaceProjectionMatrixEstimatior(q, u)
+    function [nullSpaceProjectionHat, WA_hat, Wb_hat] = ClosedFormNullSpaceProjectionMatrixEstimatior(q, u)
         % number of the regressors of the constraint function
         Ndata = length(q);
         Ndof = length(q{1});
@@ -17,6 +17,7 @@ function functionHandle = getClosedFormNullSpaceProjectionMatrixEstimatior(Phi_A
         [U,~,~]=svd(HH);
         W_hat = U(:,(end-(ConstraintDim-1)):end).'; % select the last ConstraintDim columns  
         WA_hat = W_hat(:,1:NA);
+        Wb_hat = W_hat(:,(NA+1):end);
         % Definition of Constraint matrix and main task
         A_hat = @(q) WA_hat*Phi_A(q); % Constraint matrix as a function of configuration
         nullSpaceProjectionHat = getNullSpaceProjection(A_hat);
