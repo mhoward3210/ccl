@@ -20,7 +20,7 @@
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 NDem = 12; % number of demonstrations
-Dangle = 20; % variation of angle in roll and pitch
+Dangle = 30; % variation of angle in roll and pitch
 % timming:
 tf = 30; % duration of each simulation is seconds
 freq = 30; % number of samples per second
@@ -73,6 +73,8 @@ c = cell(1, NDem); % wiping circle centre
 r = cell(1, NDem); % wiping circle radious
 n = cell(1, NDem); % planar surface normal
 Phi = cell(1,NDem); % policy regressors
+roll = cell(1,NDem);
+pitch = cell(1,NDem);
 unconstrainedPolicy = cell(1,NDem); % unconstrainedPolicy
 time = linspace(0,tf,tf*freq); % time vector
 timecond = time>cutOffTime;
@@ -80,9 +82,9 @@ for idx=1:NDem
     % Random variables:
     c{idx} = [rand().*0.15 + 0.45; rand().*0.1-0.05; rand().*0.15+0.35]; % generate random circle centre
     r{idx} = rand()*0.02+0.03; % generate random circle radious
-    roll = rand()*(2*Dangle) - Dangle; 
-    pitch = rand()*(2*Dangle) - Dangle;
-    T = rpy2tr(roll, pitch, 0); % homogeneous transformation for the end-effector
+    roll{idx} = rand()*(2*Dangle) - Dangle; 
+    pitch{idx} = rand()*(2*Dangle) - Dangle;
+    T = rpy2tr(roll{idx}, pitch{idx}, 0); % homogeneous transformation for the end-effector
     n{idx} = T(1:3,3);
     % Constant matrices:
     W_A = blkdiag(n{idx}.', n{idx}.', n{idx}.'); % constant gain matrix for the Constraint matrix
@@ -92,7 +94,7 @@ for idx=1:NDem
     b = @(x) W_b*feval(Phi_b,x); % main task as a function of the configuration
     % Constrained Policie
     Phi{idx} = getUnconstrainedPolicyRegressors4CircularWipingMotion(robot, c{idx}, r{idx}); % Get regressors for the unconstrained policy
-    unconstrainedPolicy{idx} = @(x) Phi{idx}(x)*[1; 1];
+    unconstrainedPolicy{idx} = @(x) Phi{idx}(x)*[1; 10];
     x_dot = getConstrainedPolicy(A, b, unconstrainedPolicy{idx});
     % solving motion
     sol = ode113(@(t,x) x_dot(x),[0 tf], x0);
