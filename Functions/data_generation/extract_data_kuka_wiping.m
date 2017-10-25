@@ -11,7 +11,7 @@
 % October 2017; Last revision: 17-Oct-2017
 
 %% User Input
-files_directory = '../../data/kuka_circle_wiping_flat/';
+files_directory = '../../../Leo_code_test/joao_library/demonstrations_mat/';
 N_cut = 100; % initial N samples to be ignored due to initial adaptation to path
 data_file_name = 'data.mat';
 NDem = 12; % number of demonstrations to store (< number of files in dir)
@@ -21,7 +21,8 @@ NDem = 12; % number of demonstrations to store (< number of files in dir)
 file_names = dir(strcat(files_directory,'2017*.mat')); % get data from real
 % robot (previously converted from bag file to *.mat file)
 Nfiles = length(file_names); % number of *.mat files in the specified directory
-if NDem > Nfiles; Ndem = Nfiles; end
+% Condition to assert if the NDem is not > number of files
+if NDem > Nfiles; NDem = Nfiles; end
 x = cell(1, NDem); % store state (robot configuration)
 u = cell(1, NDem); % store input (configuration velocity)
 t = cell(1, NDem); % store time
