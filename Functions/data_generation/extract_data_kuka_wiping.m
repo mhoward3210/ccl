@@ -8,7 +8,7 @@
 % Edinburgh Centre for Robotics, Edinburgh, UK
 % email address: Joao.Moura@ed.ac.uk
 % Website: http://www.edinburgh-robotics.org/students/joao-moura
-% October 2017; Last revision: 17-Oct-2017
+% October 2017; Last revision: 25-Oct-2017
 
 %% User Input
 files_directory = '../../../Leo_code_test/joao_library/demonstrations_mat/';
@@ -37,8 +37,8 @@ for i=1:NDem
     u{i} = num2cell((diff(q_i)./dt_i).',1); % save input: joint velocities
     t{i} = num2cell(cumsum(dt_i).',1); % demonstration time
     % cut initial samples
-    x{i} = x{1}(N_cut:end);
-    u{i} = u{1}(N_cut:end);
-    t{i} = t{1}(N_cut:end); 
+    x{i} = x{i}(N_cut:end);
+    u{i} = u{i}(N_cut:end);
+    t{i} = t{i}(N_cut:end); 
 end
 save(data_file_name,'x','u','t');
