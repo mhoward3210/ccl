@@ -55,7 +55,7 @@ NDem = length(x); % number of demonstrations
 fprintf(1,'Defining robot model ...\n');
 robot = SerialLink(DH); % Peters Cork robotics library has to be installed
 Phi_A = getConstraintMatrixRegressor4SurfacePerpendicularMotion(robot); % Phi_A(x): vector of regressors for the Constraint matrix as a function of the configuration
-Phi_b = getTaskRegressors4SurfacePerpendicularMotionExp(robot); % Phi_b(x): vector of regressors for the main task as a function of the configuration
+Phi_b = getTaskRegressors4SurfacePerpendicularMotionSimulated(robot); % Phi_b(x): vector of regressors for the main task as a function of the configuration
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 
@@ -92,8 +92,10 @@ end
 fprintf(1,'Estimating constraints ...\n');
 N_Estimator = getClosedFormNullSpaceProjectionMatrixEstimatior(Phi_A, Phi_b, 3);
 N_hat = cell(1,NDem);
+WA_hat = cell(1,NDem);
+Wb_hat = cell(1,NDem);
 parfor idx=1:NDem
-    N_hat{idx} = feval(N_Estimator, x{idx}, u{idx});
+    [N_hat{idx}, WA_hat{idx}, Wb_hat] = feval(N_Estimator, x{idx}, u{idx});
 end
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
