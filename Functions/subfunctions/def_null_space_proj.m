@@ -1,4 +1,4 @@
-function functionHandle = getNullSpaceProjection(constraintMatrix)
+function functionHandle = def_null_space_proj(constraintMatrix)
     functionHandle = @nullSpaceProjection;
     function output = nullSpaceProjection(q)
         A = constraintMatrix(q); % Compute constraint matrix for given configuration

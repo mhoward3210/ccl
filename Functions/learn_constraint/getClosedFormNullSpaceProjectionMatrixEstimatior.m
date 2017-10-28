@@ -20,6 +20,6 @@ function functionHandle = getClosedFormNullSpaceProjectionMatrixEstimatior(Phi_A
         Wb_hat = W_hat(:,(NA+1):end);
         % Definition of Constraint matrix and main task
         A_hat = @(q) WA_hat*Phi_A(q); % Constraint matrix as a function of configuration
-        nullSpaceProjectionHat = getNullSpaceProjection(A_hat);
+        nullSpaceProjectionHat = def_null_space_proj(A_hat);
     end
 end
