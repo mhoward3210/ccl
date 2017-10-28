@@ -4,7 +4,7 @@ function functionHandle = getTaskRegressors4SurfacePerpendicularMotionExp(robotH
     functionHandle = @Phi_b;
     function output = Phi_b(q)
         T = robotHandle.fkine(q); % end-effector homogeneous transformation
-        tT = transl(T).'; % end-effector position
+        tT = reshape(transl(T),[],1); % end-effector position
         rot = t2r(T); % end-effector orientation (rotation matrix)
         xT = rot(:,1); yT = rot(:,2); % Unit vectors that define the plane perpendicular to end-effector
         q_M = q*q.'; % Matrix with the second order binomials of the configuration
