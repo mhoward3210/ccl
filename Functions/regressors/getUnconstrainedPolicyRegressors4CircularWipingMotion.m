@@ -1,4 +1,49 @@
 function functionHandle = getUnconstrainedPolicyRegressors4CircularWipingMotion(robotHandle, c_G, radius)
+%  Returns a function handle for the basis functions of the wiping unconstrained policy linear basis function model.
+%  The output function handle is a function of the robot arm configuration - column vector with appropriate dimension.
+%
+% Syntax:  functionHandle = getUnconstrainedPolicyRegressors4CircularWipingMotion(robotHandle, c_G, radius)
+%
+% Inputs:
+% robotHandle - Peter Corke's Serial-link robot class
+%    c_G - 3 dimensional column vector with Cartesian coordinates of the centre of the wiping motion relative to the robot global frame and in meters;
+%    radius - radius of the wiping circle in meters
+%
+% Outputs:
+%    functionHandle - function to be evaluated 
+%
+% Example: 
+%     % Robot Kinematic model specified by the Denavit-Hartenberg
+%     DH = [0.0, 0.31, 0.0, pi/2;
+%           0.0, 0.0, 0.0, -pi/2;
+%           0.0, 0.4, 0.0, -pi/2;
+%           0.0, 0.0, 0.0, pi/2;
+%           0.0, 0.39, 0.0, pi/2;
+%           0.0, 0.0, 0.0, -pi/2;
+%           0.0, 0.21-0.132, 0.0, 0.0];
+%     % Peters Cork robotics library has to be installed
+%     robot = SerialLink(DH);
+%     % Defining unconstrained policy regressors
+%     centre = [0.1; 0.0; 0.4];
+%     radius = 0.02;
+%     Phi = getUnconstrainedPolicyRegressors4CircularWipingMotion(robot, centre, radius);
+%     % Defining unconstrained policy
+%     pi_u = @(x) Phi(x)*[1 10];
+%     % Constraint matrix for given robot arm configuration
+%     x = [0;0;0;pi/2;0;-pi/2;0];
+%     disp(A(x));
+%
+% Libraries required: Peter Corke's Robotics library (MatLab add-on)
+% 
+% See also: getConstraintMatrixRegressor4SurfacePerpendicularMotion
+
+% Author: Joao Moura
+% Edinburgh Centre for Robotics, Edinburgh, UK
+% email address: Joao.Moura@ed.ac.uk
+% Website: http://www.edinburgh-robotics.org/students/joao-moura
+% October 2017; Last revision: 25-Oct-2017
+
+%------------- BEGIN CODE --------------
     functionHandle = @Phi;
     function output = Phi(q)
         J = robotHandle.jacobe(q); % Robot Jacobian in the end-effector frame
@@ -29,4 +74,5 @@ function functionHandle = getUnconstrainedPolicyRegressors4CircularWipingMotion(
             end
         end
     end
+%------------- END OF CODE --------------
 end
