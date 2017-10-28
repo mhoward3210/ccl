@@ -1,8 +1,8 @@
-function functionHandle = getUnconstrainedPolicyRegressors4CircularWipingMotion(robotHandle, c_G, radius)
+function functionHandle = def_u_pi_4_cwm(robotHandle, c_G, radius)
 %  Returns a function handle for the basis functions of the wiping unconstrained policy linear basis function model.
 %  The output function handle is a function of the robot arm configuration - column vector with appropriate dimension.
 %
-% Syntax:  functionHandle = getUnconstrainedPolicyRegressors4CircularWipingMotion(robotHandle, c_G, radius)
+% Syntax:  functionHandle = def_u_pi_4_cwm(robotHandle, c_G, radius)
 %
 % Inputs:
 % robotHandle - Peter Corke's Serial-link robot class
@@ -26,7 +26,7 @@ function functionHandle = getUnconstrainedPolicyRegressors4CircularWipingMotion(
 %     % Defining unconstrained policy regressors
 %     centre = [0.1; 0.0; 0.4];
 %     radius = 0.02;
-%     Phi = getUnconstrainedPolicyRegressors4CircularWipingMotion(robot, centre, radius);
+%     Phi = def_u_pi_4_cwm(robot, centre, radius);
 %     % Defining unconstrained policy
 %     pi_u = @(x) Phi(x)*[1 10];
 %     % Constraint matrix for given robot arm configuration

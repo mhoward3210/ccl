@@ -6,7 +6,7 @@
 % end-effector cartesian positions.
 %
 % Other m-files required: 
-%   getUnconstrainedPolicyRegressors4CircularWipingMotion.m
+%   def_u_pi_4_cwm.m
 %   def_phib_4_spm_sim.m
 %   def_phib_4_spm_exp.m
 %   def_phia_4_spm.m
@@ -81,7 +81,7 @@ parfor idx=1:NDem
     %p{idx} = transl(robot.fkine(cell2mat(q{idx}).')); % compute end-effector postion
     p{idx} = getPos(cell2mat(x{idx}).'); % compute end-effector postion
     [c{idx}, r{idx}, n{idx}] = fit3Dcircle(p{idx}(:,1),p{idx}(:,2),p{idx}(:,3));
-    Phi{idx} = getUnconstrainedPolicyRegressors4CircularWipingMotion(robot, c{idx}, r{idx}); % Get regressors for the unconstrained policy
+    Phi{idx} = def_u_pi_4_cwm(robot, c{idx}, r{idx}); % Get regressors for the unconstrained policy
 end
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------

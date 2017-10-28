@@ -5,7 +5,7 @@
 %   Saves the states and actions in file.
 %
 % Other m-files required: 
-%   getUnconstrainedPolicyRegressors4CircularWipingMotion.m
+%   def_u_pi_4_cwm.m
 %   getTaskRegressors4SurfacePerpendicultaMotionSimulated.m
 %   def_phia_4_spm.m
 %   getConstrainedPolicy.m
@@ -93,7 +93,7 @@ for idx=1:NDem
     A = @(x) W_A*feval(Phi_A,x); % Constraint matrix as a function of configuration
     b = @(x) W_b*feval(Phi_b,x); % main task as a function of the configuration
     % Constrained Policie
-    Phi{idx} = getUnconstrainedPolicyRegressors4CircularWipingMotion(robot, c{idx}, r{idx}); % Get regressors for the unconstrained policy
+    Phi{idx} = def_u_pi_4_cwm(robot, c{idx}, r{idx}); % Get regressors for the unconstrained policy
     unconstrainedPolicy{idx} = @(x) Phi{idx}(x)*[1; 10];
     x_dot = getConstrainedPolicy(A, b, unconstrainedPolicy{idx});
     % solving motion
