@@ -80,7 +80,7 @@ getPos = @(q) transl(robot.fkine(q)); % compute end-effector postion
 parfor idx=1:NDem
     %p{idx} = transl(robot.fkine(cell2mat(q{idx}).')); % compute end-effector postion
     p{idx} = getPos(cell2mat(x{idx}).'); % compute end-effector postion
-    [c{idx}, r{idx}, n{idx}] = fit3Dcircle(p{idx}(:,1),p{idx}(:,2),p{idx}(:,3));
+    [c{idx}, r{idx}, n{idx}] = fit_3d_circle(p{idx}(:,1),p{idx}(:,2),p{idx}(:,3));
     Phi{idx} = def_u_pi_4_cwm(robot, c{idx}, r{idx}); % Get regressors for the unconstrained policy
 end
 %--------------------------------------------------------------------------

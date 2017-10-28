@@ -1,4 +1,4 @@
-function [centre, radius, normal] = fit3Dcircle(x,y,z)
+function [centre, radius, normal] = fit_3d_circle(x,y,z)
     if iscolumn(x) && iscolumn(y) && iscolumn(z)
         % sphere system of equations: As * xs = ys
         As = [x y z ones(size(x))]; ys = (x.^2)+(y.^2)+(z.^2);
