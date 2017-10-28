@@ -1,5 +1,5 @@
-function functionHandle = getTaskRegressors4SurfacePerpendicularMotionSimulated(robotHandle)
-% getTaskRegressors4SurfacePerpendicularMotionSimulated - Get regressors for
+function functionHandle = def_phib_4_spm_sim(robotHandle)
+% def_phib_4_spm_sim - Get regressors for
 % the main task when representing the task vector as a product of a vector
 % of regressors by a constant matrix.
 %
@@ -24,7 +24,7 @@ function functionHandle = getTaskRegressors4SurfacePerpendicularMotionSimulated(
 %     robot = SerialLink(DH);
 %     % Phi_b(x): vector of regressors for the main task as a function of the
 %     % state
-%     Phi_b = getTaskRegressors4SurfacePerpendicularMotionSimulated(robot);
+%     Phi_b = def_phib_4_spm_sim(robot);
 %     n = [0; 0; 1];
 %     W_A = blkdiag(n.', n.', n.'); % constant gain matrix for the Constraint matrix
 %     W_b = -5*[W_A [-n.'*[0.4; 0.0; 0.0]; 0; 0]];

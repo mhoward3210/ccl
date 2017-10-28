@@ -7,7 +7,7 @@
 %
 % Other m-files required: 
 %   getUnconstrainedPolicyRegressors4CircularWipingMotion.m
-%   getTaskRegressors4SurfacePerpendicularMotionSimulated.m
+%   def_phib_4_spm_sim.m
 %   def_phib_4_spm_exp.m
 %   def_phia_4_spm.m
 %   getConstrainedPolicy.m
@@ -160,7 +160,7 @@ end
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 fprintf(1,'Compute End-Effector positions...\n');
-Phi_b = getTaskRegressors4SurfacePerpendicularMotionSimulated(robot); % vector of regressors as a function of the configuration for the main task
+Phi_b = def_phib_4_spm_sim(robot); % vector of regressors as a function of the configuration for the main task
 pos = cell(1, NDem); % wiping circle centre
 parfor idx=1:NDem
     % Problem specific constants taken from data:

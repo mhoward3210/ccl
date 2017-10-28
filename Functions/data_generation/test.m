@@ -55,7 +55,7 @@ robot = SerialLink(DH); % Peters Cork robotics library has to be installed
 Phi_A = def_phia_4_spm(robot);
 % Phi_b(x): vector of regressors for the main task as a function of the
 % state
-Phi_b = getTaskRegressors4SurfacePerpendicularMotionSimulated(robot);
+Phi_b = def_phib_4_spm_sim(robot);
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 
