@@ -1,6 +1,6 @@
 % Get regressors for the main task when representing the task vector as a
 % product of a vector of regressors by a constant matrix
-function functionHandle = getTaskRegressors4SurfacePerpendicularMotionExp(robotHandle)
+function functionHandle = def_phib_4_spm_exp(robotHandle)
     functionHandle = @Phi_b;
     function output = Phi_b(q)
         T = robotHandle.fkine(q); % end-effector homogeneous transformation

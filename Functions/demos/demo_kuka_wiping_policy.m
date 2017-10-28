@@ -8,7 +8,7 @@
 % Other m-files required: 
 %   getUnconstrainedPolicyRegressors4CircularWipingMotion.m
 %   getTaskRegressors4SurfacePerpendicularMotionSimulated.m
-%   getTaskRegressors4SurfacePerpendicularMotionExp.m
+%   def_phib_4_spm_exp.m
 %   def_phia_4_spm.m
 %   getConstrainedPolicy.m
 
@@ -55,7 +55,7 @@ NDem = length(x); % number of demonstrations
 fprintf(1,'Defining robot model ...\n');
 robot = SerialLink(DH); % Peters Cork robotics library has to be installed
 Phi_A = def_phia_4_spm(robot); % Phi_A(x): vector of regressors for the Constraint matrix as a function of the configuration
-Phi_b = getTaskRegressors4SurfacePerpendicularMotionExp(robot); % Phi_b(x): vector of regressors for the main task as a function of the configuration
+Phi_b = def_phib_4_spm_exp(robot); % Phi_b(x): vector of regressors for the main task as a function of the configuration
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 
@@ -92,10 +92,8 @@ end
 fprintf(1,'Estimating constraints ...\n');
 N_Estimator = getClosedFormNullSpaceProjectionMatrixEstimatior(Phi_A, Phi_b, 3);
 N_hat = cell(1,NDem);
-WA_hat = cell(1,NDem);
-Wb_hat = cell(1,NDem);
 parfor idx=1:NDem
-    [N_hat{idx}, WA_hat{idx}, Wb_hat] = feval(N_Estimator, x{idx}, u{idx});
+    N_hat{idx} = feval(N_Estimator, x{idx}, u{idx});
 end
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
@@ -116,7 +114,7 @@ model.var = scale.*std(xall,1,1).';
 fprintf(1,'Computing Receptive Fields Centres ...\n');
 stream = RandStream('mlfg6331_64');  % Random number stream for parallel computation
 options = statset('Display','off','MaxIter',200,'UseParallel',1,'UseSubstreams',1,'Streams',stream);
-Nmodels = 25;
+Nmodels = 50;
 [~,C] = kmeans(xall,Nmodels,'Distance','cityblock','EmptyAction','singleton','Start','uniform',...
     'Replicates',10,'OnlinePhase','off','Options', options);
 model.c = C.';
@@ -177,7 +175,7 @@ parfor idx=1:NDem
     % Constrained Policie
     dx = getConstrainedPolicy(A, b, policy{idx});
     % solving motion
-    [time,traj] = ode113(@(t,x) dx(x),[0 t{idx}{end}], x0);
+    [~,traj] = ode113(@(t,x) dx(x),[0 t{idx}{end}], x0);
     %pos=transl(robot.fkine(traj));
     pos{idx}=getPos(traj);
 end
@@ -200,6 +198,7 @@ for idx=1:NDem
     legend('centre','data','policy','circle');
     axis equal;
 end
+error('stop here');
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 
