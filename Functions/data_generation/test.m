@@ -8,7 +8,7 @@
 %   def_u_pi_4_cwm.m
 %   def_phib_4_spm_sim.m
 %   def_phia_4_spm.m
-%   getConstrainedPolicy.m
+%   def_constrained_policy.m
 
 % Author: Joao Moura
 % Edinburgh Centre for Robotics, Edinburgh, UK
@@ -85,7 +85,7 @@ b = @(x) W_b*feval(Phi_b,x); % main task as a function of the configuration
 % Constrained Policie
 Phi = def_u_pi_4_cwm(robot, c, r); % Get regressors for the unconstrained policy
 unconstrainedPolicy = @(x) Phi(x)*[1; 10];
-x_dot = getConstrainedPolicy(A, b, unconstrainedPolicy);
+x_dot = def_constrained_policy(A, b, unconstrainedPolicy);
 % solving motion
 sol = ode113(@(t,x) x_dot(x),[0 tf], x0);
 [traj, dtraj] = deval(sol,time); % evaluation of solution

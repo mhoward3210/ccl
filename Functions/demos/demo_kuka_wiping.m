@@ -10,7 +10,7 @@
 %   def_phib_4_spm_sim.m
 %   def_phib_4_spm_exp.m
 %   def_phia_4_spm.m
-%   getConstrainedPolicy.m
+%   def_constrained_policy.m
 
 % Author: Joao Moura
 % Edinburgh Centre for Robotics, Edinburgh, UK
@@ -173,7 +173,7 @@ parfor idx=1:NDem
     A = @(x) W_A*feval(Phi_A,x); % Constraint matrix as a function of configuration
     b = @(x) W_b*feval(Phi_b,x); % main task as a function of the configuration
     % Constrained Policie
-    dx = getConstrainedPolicy(A, b, policy{idx});
+    dx = def_constrained_policy(A, b, policy{idx});
     % solving motion
     [~,traj] = ode113(@(t,x) dx(x),[0 t{idx}{end}], x0);
     %pos=transl(robot.fkine(traj));

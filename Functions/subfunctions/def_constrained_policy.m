@@ -1,6 +1,6 @@
 % Get constrained policy as function of configuration given the follow .  ing
 % functions: constraintMatrix, task, unconstrained policy
-function functionHandle = getConstrainedPolicy(constraintMatrix, task, unconstrainedPolicy)
+function functionHandle = def_constrained_policy(constraintMatrix, task, unconstrainedPolicy)
     functionHandle = @constrainedPolicy; % return handle of constrained policy 
     function output = constrainedPolicy(q)
         A = constraintMatrix(q); % Compute constraint matrix for given configuration

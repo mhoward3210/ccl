@@ -8,7 +8,7 @@
 %   def_u_pi_4_cwm.m
 %   getTaskRegressors4SurfacePerpendicultaMotionSimulated.m
 %   def_phia_4_spm.m
-%   getConstrainedPolicy.m
+%   def_constrained_policy.m
 
 % Author: Joao Moura
 % Edinburgh Centre for Robotics, Edinburgh, UK
@@ -95,7 +95,7 @@ for idx=1:NDem
     % Constrained Policie
     Phi{idx} = def_u_pi_4_cwm(robot, c{idx}, r{idx}); % Get regressors for the unconstrained policy
     unconstrainedPolicy{idx} = @(x) Phi{idx}(x)*[1; 10];
-    x_dot = getConstrainedPolicy(A, b, unconstrainedPolicy{idx});
+    x_dot = def_constrained_policy(A, b, unconstrainedPolicy{idx});
     % solving motion
     sol = ode113(@(t,x) x_dot(x),[0 tf], x0);
     [traj, dtraj] = deval(sol,time); % evaluation of solution
