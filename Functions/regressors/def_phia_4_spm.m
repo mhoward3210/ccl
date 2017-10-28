@@ -1,11 +1,11 @@
 function functionHandle = def_phia_4_spm(robotHandle)
-% Defines suitable regressors for the constraint matrix for a motion perpendicular to a surface.
+% Defines suitable regressors for the constraint matrix for a surface perpendicular motion.
 %
 % Consider a Constraint matrix defined as a linear combination of regressors:
 %
-%         A(x) = W * Phi_A(x),
+%         A(x) = W_A * Phi_A(x),
 %
-% where W is a matrix of weights, and Phi_A(x) is a matrix of regressors.
+% where W_A is a matrix of weights, and Phi_A(x) is a matrix of regressors.
 % def_phia_4_spm returns a MatLab function handle to a set of regressors
 % suitable for the constraint of moving the robot end-effector in contact 
 % and perpendicular to a surface.
