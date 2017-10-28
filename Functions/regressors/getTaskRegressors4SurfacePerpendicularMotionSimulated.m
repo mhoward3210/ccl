@@ -1,10 +1,9 @@
-% 
 function functionHandle = getTaskRegressors4SurfacePerpendicularMotionSimulated(robotHandle)
-%GETTASKREGRESSORS4SRFACEPERTENDCULARMOTIONSIMULATED - Get regressors for
+% getTaskRegressors4SurfacePerpendicularMotionSimulated - Get regressors for
 % the main task when representing the task vector as a product of a vector
 % of regressors by a constant matrix.
 %
-% Syntax:  functionHandle = getTaskRegressors4SurfacePerpendicularMotionSimulated(robotHandle)
+% Syntax:  functionHandle = GETTASKREGRESSORS4SRFACEPERTENDCULARMOTIONSIMULATED(robotHandle)
 %
 % Inputs:
 %    robotHandle - Peter Corke's Serial-link robot class
@@ -25,7 +24,7 @@ function functionHandle = getTaskRegressors4SurfacePerpendicularMotionSimulated(
 % robot = SerialLink(DH);
 % % Phi_b(x): vector of regressors for the main task as a function of the
 % % state
-% Phi_b = getTaskRegressors4SurfacePerpendicultaMotionSimulated(robot);
+% Phi_b = getTaskRegressors4SurfacePerpendicularMotionSimulated(robot);
 % n = [0; 0; 1];
 % W_A = blkdiag(n.', n.', n.'); % constant gain matrix for the Constraint matrix
 % W_b = -5*[W_A [-n.'*[0.4; 0.0; 0.0]; 0; 0]];
@@ -48,9 +47,10 @@ function functionHandle = getTaskRegressors4SurfacePerpendicularMotionSimulated(
     functionHandle = @Phi_b;
     function output = Phi_b(q)
         T = robotHandle.fkine(q); % end-effector homogeneous transformation
-        tT = transl(T).'; % end-effector position
+        tT = reshape(transl(TT),[],1); % end-effector position
         rot = t2r(T); % end-effector orientation (rotation matrix)
         xT = rot(:,1); yT = rot(:,2); % Unit vectors that define the plane perpendicular to end-effector
         output = [tT; xT; yT; 1];
     end
+%------------- END OF CODE --------------
 end
