@@ -9,7 +9,7 @@
 %   getUnconstrainedPolicyRegressors4CircularWipingMotion.m
 %   getTaskRegressors4SurfacePerpendicularMotionSimulated.m
 %   getTaskRegressors4SurfacePerpendicularMotionExp.m
-%   getConstraintMatrixRegressor4SurfacePerpendicularMotion.m
+%   def_phia_4_spm.m
 %   getConstrainedPolicy.m
 
 % Author: Joao Moura
@@ -54,7 +54,7 @@ NDem = length(x); % number of demonstrations
 %--------------------------------------------------------------------------
 fprintf(1,'Defining robot model ...\n');
 robot = SerialLink(DH); % Peters Cork robotics library has to be installed
-Phi_A = getConstraintMatrixRegressor4SurfacePerpendicularMotion(robot); % Phi_A(x): vector of regressors for the Constraint matrix as a function of the configuration
+Phi_A = def_phia_4_spm(robot); % Phi_A(x): vector of regressors for the Constraint matrix as a function of the configuration
 Phi_b = getTaskRegressors4SurfacePerpendicularMotionExp(robot); % Phi_b(x): vector of regressors for the main task as a function of the configuration
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------

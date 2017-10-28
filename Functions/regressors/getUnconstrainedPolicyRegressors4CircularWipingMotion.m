@@ -35,7 +35,7 @@ function functionHandle = getUnconstrainedPolicyRegressors4CircularWipingMotion(
 %
 % Libraries required: Peter Corke's Robotics library (MatLab add-on)
 % 
-% See also: getConstraintMatrixRegressor4SurfacePerpendicularMotion
+% See also: def_phia_4_spm
 
 % Author: Joao Moura
 % Edinburgh Centre for Robotics, Edinburgh, UK

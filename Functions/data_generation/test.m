@@ -7,7 +7,7 @@
 % Other m-files required: 
 %   getUnconstrainedPolicyRegressors4CircularWipingMotion.m
 %   getTaskRegressors4SurfacePerpendicultaMotionSimulated.m
-%   getConstraintMatrixRegressor4SurfacePerpendicularMotion.m
+%   def_phia_4_spm.m
 %   getConstrainedPolicy.m
 
 % Author: Joao Moura
@@ -52,7 +52,7 @@ DH = [0.0, 0.31, 0.0, pi/2; % Robot Kinematic model specified by the Denavit-Har
 robot = SerialLink(DH); % Peters Cork robotics library has to be installed
  % Phi_A(x): vector of regressors for the Constraint matrix as a function
  % of the state
-Phi_A = getConstraintMatrixRegressor4SurfacePerpendicularMotion(robot);
+Phi_A = def_phia_4_spm(robot);
 % Phi_b(x): vector of regressors for the main task as a function of the
 % state
 Phi_b = getTaskRegressors4SurfacePerpendicularMotionSimulated(robot);

@@ -1,9 +1,9 @@
-function functionHandle = getConstraintMatrixRegressor4SurfacePerpendicularMotion(robotHandle)
+function functionHandle = def_phia_4_spm(robotHandle)
 %GETCONSTRAINEDMATRIXREGRESSORS4SREFACEPERPENDICULARMOTION - Get regressors 
 % for the constraint matrix when representing the constraint matrix as the 
 % product of a vector of regressors by a constant matrix.
 %
-% Syntax:  functionHandle = getConstraintMatrixRegressor4SurfacePerpendicularMotion(robotHandle)
+% Syntax:  functionHandle = def_phia_4_spm(robotHandle)
 %
 % Inputs:
 %    robotHandle - Peter Corke's Serial-link robot class
@@ -26,7 +26,7 @@ function functionHandle = getConstraintMatrixRegressor4SurfacePerpendicularMotio
 %     % of the state
 %     n = [0; 0; 1];
 %     W_A = blkdiag(n.', n.', n.'); % constant gain matrix for the Constraint matrix
-%     PhiA = getConstraintMatrixRegressor4SurfacePerpendicularMotion(robot);
+%     PhiA = def_phia_4_spm(robot);
 %     % Constraint matrix as a function of configuration
 %     A = @(x) W_A*PhiA(x);
 %     % Constraint matrix for given robot arm configuration
