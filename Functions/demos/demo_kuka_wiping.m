@@ -127,7 +127,7 @@ model.c = C.';
 fprintf(1,'Learning Model Parameters...\n');
 R_cell = cell(1,NDem);
 parfor idx=1:NDem
-    R_cell{idx} = computeRMatrix(N_hat{idx}, Phi{idx}, x{idx});
+    R_cell{idx} = compute_matrix_r(N_hat{idx}, Phi{idx}, x{idx});
 end
 R = cell2mat([R_cell{:}].');
 Y = cell2mat([u{:}].');
