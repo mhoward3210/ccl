@@ -34,7 +34,7 @@ DH = [0.0, 0.31, 0.0, pi/2; % Robot Kinematic model specified by the Denavit-Har
 %% Add path
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
-addpath(genpath('../'));
+addpath(genpath('../')); % add the library and it's subfolders to the path
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ addpath(genpath('../'));
 %--------------------------------------------------------------------------
 fprintf(1,'Getting data ...\n');
 %load('../data_generation/data_simulated.mat');
-load('data_simulated.mat');
+load('data.mat');
 %load('demonstrations_mat/data.mat');
 NDem = length(x); % number of demonstrations
 %--------------------------------------------------------------------------
@@ -55,7 +55,7 @@ NDem = length(x); % number of demonstrations
 fprintf(1,'Defining robot model ...\n');
 robot = SerialLink(DH); % Peters Cork robotics library has to be installed
 Phi_A = getConstraintMatrixRegressor4SurfacePerpendicularMotion(robot); % Phi_A(x): vector of regressors for the Constraint matrix as a function of the configuration
-Phi_b = getTaskRegressors4SurfacePerpendicularMotionSimulated(robot); % Phi_b(x): vector of regressors for the main task as a function of the configuration
+Phi_b = getTaskRegressors4SurfacePerpendicularMotionExp(robot); % Phi_b(x): vector of regressors for the main task as a function of the configuration
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 
@@ -116,7 +116,8 @@ model.var = scale.*std(xall,1,1).';
 fprintf(1,'Computing Receptive Fields Centres ...\n');
 stream = RandStream('mlfg6331_64');  % Random number stream for parallel computation
 options = statset('Display','off','MaxIter',200,'UseParallel',1,'UseSubstreams',1,'Streams',stream);
-[~,C] = kmeans(xall,25,'Distance','cityblock','EmptyAction','singleton','Start','uniform',...
+Nmodels = 25;
+[~,C] = kmeans(xall,Nmodels,'Distance','cityblock','EmptyAction','singleton','Start','uniform',...
     'Replicates',10,'OnlinePhase','off','Options', options);
 model.c = C.';
 %--------------------------------------------------------------------------
@@ -134,9 +135,10 @@ R = cell2mat([R_cell{:}].');
 Y = cell2mat([u{:}].');
 B = zeros(size(Phi{1}(x{1}{1}),2),length(model.c));
 w = @(m) @(x) exp(-0.5.*sum(bsxfun(@rdivide, bsxfun(@minus,x,model.c(:,m)).^2, model.var))).'; % importance weights W = [w1 w2 ... w_m ... w_M]
-parfor m=1:length(model.c)
+[nRrow,nRcol] = size(R_cell{1}{1});
+parfor m=1:size(model.c,2)
     wm = feval(w, m);
-    Wm = repelem(wm(xall.'),7,2);
+    Wm = repelem(wm(xall.'),nRrow,nRcol);
     RWm = R.*Wm;
     B(:,m) = pinv(RWm.'*R)*RWm.'*Y;
 end
@@ -162,7 +164,7 @@ end
 fprintf(1,'Compute End-Effector positions...\n');
 Phi_b = getTaskRegressors4SurfacePerpendicularMotionSimulated(robot); % vector of regressors as a function of the configuration for the main task
 pos = cell(1, NDem); % wiping circle centre
-for idx=1:NDem
+parfor idx=1:NDem
     % Problem specific constants taken from data:
     x0 = x{idx}{1}; % initial configuration
     Kp = 5; % proportional gain
@@ -192,8 +194,8 @@ for idx=1:NDem
     subplot(3,4,idx);
     plot3(c{idx}(1),c{idx}(2),c{idx}(3),'*r'); hold on;
     plot3(p{idx}(:,1),p{idx}(:,2),p{idx}(:,3),'g');
-    plot3(pos{idx}(:,1),pos{idx}(:,2),pos{idx}(:,3),'*');
-    %plotCircle3D(c{idx},r{idx},n{idx});
+    plot3(pos{idx}(:,1),pos{idx}(:,2),pos{idx}(:,3));
+    plotCircle3D(c{idx},r{idx},n{idx});
     xlabel('x'); ylabel('y'); zlabel('z');
     legend('centre','data','policy','circle');
     axis equal;
