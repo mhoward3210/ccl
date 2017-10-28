@@ -1,4 +1,4 @@
-function functionHandle = getWeightedLinearModelPolicy(model, Phi)
+function functionHandle = def_weighted_linear_model(model, Phi)
     functionHandle = @weightedLinearModelPolicy;
     % Model variables:
     c = model.c;

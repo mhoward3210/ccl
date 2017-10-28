@@ -150,7 +150,7 @@ model.b = B;
 fprintf(1,'Computing Unconstrained Policy...\n');
 policy = cell(1,NDem);
 parfor idx=1:NDem
-    policy{idx} = getWeightedLinearModelPolicy(model, Phi{idx});
+    policy{idx} = def_weighted_linear_model(model, Phi{idx});
 end
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
