@@ -1,7 +1,7 @@
 function functionHandle = def_phia_4_spm(robotHandle)
 % Define suitable constraint matrix regressors for a surface perpendicular motion.
 %
-% Consider a set of Constraints defined as a linear combination of regressors:
+% Consider a Constraint matrix defined as a linear combination of regressors:
 %
 %         A(x) = W * Phi_A(x),
 %
