@@ -3,8 +3,12 @@ function functionHandle = getUnconstrainedPolicyRegressors4CircularWipingMotion(
     function output = Phi(q)
         J = robotHandle.jacobe(q); % Robot Jacobian in the end-effector frame
         Jtask = J(1:2,:); % Jacobian for the x and y coordinates - perpendicular plane to the end-effector
+        %Phi_kappa = getPhi_kappa(robotHandle, c_G, radius); % regressors for the secondary task
+        %output = pinv(Jtask)*Phi_kappa(q);
+        N = eye(length(q)) - (Jtask\Jtask); % Compute null-space projection matrix for given configuration
         Phi_kappa = getPhi_kappa(robotHandle, c_G, radius); % regressors for the secondary task
-        output = pinv(Jtask)*Phi_kappa(q);
+        Phi_gamma = @(q) kron([q.' 1],eye(length(q))); % regressors for the third task
+        output = [Jtask\Phi_kappa(q) N*Phi_gamma(q)];
     end
     function functionHandle = getPhi_kappa(robotHandle, c_G, radius)
         functionHandle = @Phi_kappa;
