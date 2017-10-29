@@ -1,4 +1,4 @@
-function functionHandle = def_u_pi_4_cwm(robotHandle, c_G, radius)
+function functionHandle = def_phi_4_cwm(robotHandle, c_G, radius)
 % Defines a set of regressors for a unconstrained policy for a circular wiping motion.
 %
 % Consider the decomposition of the robot actions as a main task and
@@ -13,12 +13,12 @@ function functionHandle = def_u_pi_4_cwm(robotHandle, c_G, radius)
 %       u_pi(x) = Phi(x) * bm;
 %
 % where bm is a matrix of weights, and Phi(x) is a matrix of regressors.
-% def_u_pi_4_cwm returns a MatLab function handle to a set of regressors
+% def_phi_4_cwm returns a MatLab function handle to a set of regressors
 % suitable for the secondary task of circular motions with specified radius
 % and centre.
 % This regressors are a function of the robot configuration - column vector.
 %
-% Syntax:  functionHandle = def_u_pi_4_cwm(robotHandle, c_G, radius)
+% Syntax:  functionHandle = def_phi_4_cwm(robotHandle, c_G, radius)
 %
 % Inputs: robotHandle - Peter Corke's Serial-link robot class;
 %         c_G - 3 dimensional column vector with Cartesian coordinates of the centre 
@@ -43,7 +43,7 @@ function functionHandle = def_u_pi_4_cwm(robotHandle, c_G, radius)
 %     % Defining unconstrained policy regressors:
 %     centre = [0.1; 0.0; 0.4];
 %     radius = 0.02;
-%     Phi = def_u_pi_4_cwm(robot, centre, radius);
+%     Phi = def_phi_4_cwm(robot, centre, radius);
 %     % Defining unconstrained policy:
 %     u_pi = @(x) Phi(x)*[1 10];
 %     % Constraint matrix for given robot arm configuration:
