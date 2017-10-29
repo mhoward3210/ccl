@@ -58,16 +58,16 @@ function functionHandle = def_phib_4_spm_exp(robotHandle)
 % October 2017; Last revision: 28-Oct-2017
 
 %------------- BEGIN CODE --------------
-    functionHandle = @Phi_b;
-    function output = Phi_b(q)
-        T = robotHandle.fkine(q); % End-effector homogeneous transformation.
-        tT = reshape(transl(T),[],1); % End-effector position.
-        rot = t2r(T); % End-effector orientation (rotation matrix).
-        xT = rot(:,1); yT = rot(:,2); % Unit vectors that define the plane perpendicular to end-effector.
-        q_M = q*q.'; % Matrix with the second order binomials of the configuration.
-        mask = triu(true(length(q))); % Mask to choose half of the elements.
-        q_2order = q_M(mask); % Second order binomials of the configuration.
-        output = [q_2order; q; tT; xT; yT; 1];
-    end
+functionHandle = @Phi_b;
+function output = Phi_b(q)
+    T = robotHandle.fkine(q); % End-effector homogeneous transformation.
+    tT = reshape(transl(T),[],1); % End-effector position.
+    rot = t2r(T); % End-effector orientation (rotation matrix).
+    xT = rot(:,1); yT = rot(:,2); % Unit vectors that define the plane perpendicular to end-effector.
+    q_M = q*q.'; % Matrix with the second order binomials of the configuration.
+    mask = triu(true(length(q))); % Mask to choose half of the elements.
+    q_2order = q_M(mask); % Second order binomials of the configuration.
+    output = [q_2order; q; tT; xT; yT; 1];
+end
 %------------- END OF CODE --------------
 end

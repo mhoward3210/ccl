@@ -24,11 +24,11 @@ function functionHandle = def_null_space_proj(constraintMatrix)
 % October 2017; Last revision: 29-Oct-2017
 
 %------------- BEGIN CODE --------------
-    functionHandle = @nullSpaceProjection;
-    function output = nullSpaceProjection(q)
-        A = constraintMatrix(q); % Compute constraint matrix for given configuration.
-        Ainv = pinv(A); % Pseudo inverse of constraint matrix.
-        output = eye(length(q)) - Ainv*A; % Compute null-space projection matrix for given configuration.
-    end
+functionHandle = @nullSpaceProjection;
+function output = nullSpaceProjection(q)
+    A = constraintMatrix(q); % Compute constraint matrix for given configuration.
+    Ainv = pinv(A); % Pseudo inverse of constraint matrix.
+    output = eye(length(q)) - Ainv*A; % Compute null-space projection matrix for given configuration.
+end
 %------------- END OF CODE --------------
 end
