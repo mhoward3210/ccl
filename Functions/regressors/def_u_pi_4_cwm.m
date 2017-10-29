@@ -1,19 +1,36 @@
 function functionHandle = def_u_pi_4_cwm(robotHandle, c_G, radius)
-%  Returns a function handle for the basis functions of the wiping unconstrained policy linear basis function model.
-%  The output function handle is a function of the robot arm configuration - column vector with appropriate dimension.
+% Defines a set of regressors for a unconstrained policy for a circular wiping motion.
+%
+% Consider the decomposition of the robot actions as a main task and
+% a secondary task in the null space of the main:
+%
+%       u(x) = pinv(A(x)) * b(x) + (I - pinv(A(x)) * A(x)) * u_pi(x),
+%       
+% where x is the state (robot configuration), A(x) a Pfaffian constraint matrix,
+% and u_pi(x) is the unconstrained policy for the secondary task.
+% Consider we model u_pi(x) as a linear combination of a set of regressors that depend on the state x:
+%
+%       u_pi(x) = Phi(x) * bm;
+%
+% where bm is a matrix of weights, and Phi(x) is a matrix of regressors.
+% def_u_pi_4_cwm returns a MatLab function handle to a set of regressors
+% suitable for the secondary task of circular motions with specified radius
+% and centre.
+% This regressors are a function of the robot configuration - column vector.
 %
 % Syntax:  functionHandle = def_u_pi_4_cwm(robotHandle, c_G, radius)
 %
-% Inputs:
-% robotHandle - Peter Corke's Serial-link robot class
-%    c_G - 3 dimensional column vector with Cartesian coordinates of the centre of the wiping motion relative to the robot global frame and in meters;
-%    radius - radius of the wiping circle in meters
+% Inputs: robotHandle - Peter Corke's Serial-link robot class;
+%         c_G - 3 dimensional column vector with Cartesian coordinates of the centre 
+%               of the wiping motion relative to the robot global frame and in meters;
+%         radius - radius of the wiping circle in meters.
 %
 % Outputs:
-%    functionHandle - function to be evaluated 
+%    functionHandle - MatLab function handle with robot configuration 
+%                     (column vector) as input
 %
 % Example: 
-%     % Robot Kinematic model specified by the Denavit-Hartenberg
+%     % Robot Kinematic model specified by the Denavit-Hartenberg:
 %     DH = [0.0, 0.31, 0.0, pi/2;
 %           0.0, 0.0, 0.0, -pi/2;
 %           0.0, 0.4, 0.0, -pi/2;
@@ -21,21 +38,21 @@ function functionHandle = def_u_pi_4_cwm(robotHandle, c_G, radius)
 %           0.0, 0.39, 0.0, pi/2;
 %           0.0, 0.0, 0.0, -pi/2;
 %           0.0, 0.21-0.132, 0.0, 0.0];
-%     % Peters Cork robotics library has to be installed
+%     % Peters Cork robotics library has to be installed:
 %     robot = SerialLink(DH);
-%     % Defining unconstrained policy regressors
+%     % Defining unconstrained policy regressors:
 %     centre = [0.1; 0.0; 0.4];
 %     radius = 0.02;
 %     Phi = def_u_pi_4_cwm(robot, centre, radius);
-%     % Defining unconstrained policy
-%     pi_u = @(x) Phi(x)*[1 10];
-%     % Constraint matrix for given robot arm configuration
+%     % Defining unconstrained policy:
+%     u_pi = @(x) Phi(x)*[1 10];
+%     % Constraint matrix for given robot arm configuration:
 %     x = [0;0;0;pi/2;0;-pi/2;0];
-%     disp(A(x));
+%     disp(u_pi(x));
 %
 % Libraries required: Peter Corke's Robotics library (MatLab add-on)
 % 
-% See also: def_phia_4_spm
+% See also: def_phia_4_spm, def_phib_4_spm_sim, def_phia_4_spm
 
 % Author: Joao Moura
 % Edinburgh Centre for Robotics, Edinburgh, UK
@@ -46,13 +63,13 @@ function functionHandle = def_u_pi_4_cwm(robotHandle, c_G, radius)
 %------------- BEGIN CODE --------------
 functionHandle = @Phi;
 function output = Phi(q)
-    J = robotHandle.jacobe(q); % Robot Jacobian in the end-effector frame
-    Jtask = J(1:2,:); % Jacobian for the x and y coordinates - perpendicular plane to the end-effector
-    %Phi_kappa = getPhi_kappa(robotHandle, c_G, radius); % regressors for the secondary task
+    J = robotHandle.jacobe(q); % Robot Jacobian in the end-effector frame.
+    Jtask = J(1:2,:); % Jacobian for the x and y coordinates - perpendicular plane to the end-effector.
+    %Phi_kappa = getPhi_kappa(robotHandle, c_G, radius); % Regressors for the secondary task.
     %output = pinv(Jtask)*Phi_kappa(q);
-    N = eye(length(q)) - (Jtask\Jtask); % Compute null-space projection matrix for given configuration
-    Phi_kappa = getPhi_kappa(robotHandle, c_G, radius); % regressors for the secondary task
-    Phi_gamma = @(q) kron([q.' 1],eye(length(q))); % regressors for the third task
+    N = eye(length(q)) - (Jtask\Jtask); % Compute null-space projection matrix for given configuration.
+    Phi_kappa = getPhi_kappa(robotHandle, c_G, radius); % Regressors for the secondary task.
+    Phi_gamma = @(q) kron([q.' 1],eye(length(q))); % Regressors for the third task.
     output = [Jtask\Phi_kappa(q) N*Phi_gamma(q)];
 end
 function functionHandle = getPhi_kappa(robotHandle, c_G, radius)

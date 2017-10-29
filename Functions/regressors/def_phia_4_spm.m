@@ -43,7 +43,7 @@ function functionHandle = def_phia_4_spm(robotHandle)
 %
 % Libraries required: Peter Corke's Robotics library (MatLab add-on)
 % 
-% See also: 
+% See also: def_phib_4_spm_sim, def_phib_4_spm_exp, def_u_pi_4_cwm
 
 % Author: Joao Moura
 % Edinburgh Centre for Robotics, Edinburgh, UK

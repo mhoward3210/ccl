@@ -23,7 +23,8 @@ function functionHandle = def_phib_4_spm_sim(robotHandle)
 %    robotHandle - Peter Corke's Serial-link robot class
 %
 % Outputs:
-%    functionHandle - function to be evaluated 
+%    functionHandle - MatLab function handle with robot configuration 
+%                     (column vector) as input
 %
 % Example: 
 %     % Robot Kinematic model specified by the Denavit-Hartenberg:
@@ -49,7 +50,7 @@ function functionHandle = def_phib_4_spm_sim(robotHandle)
 %
 % Libraries required: Peter Corke's Robotics library (MatLab add-on)
 % 
-% See also:  def_phib_4_spm_sim
+% See also:  def_phib_4_spm_exp, def_phia_4_spm, def_u_pi_cwm
 
 % Author: Joao Moura
 % Edinburgh Centre for Robotics, Edinburgh, UK
