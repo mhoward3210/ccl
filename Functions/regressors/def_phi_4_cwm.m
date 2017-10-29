@@ -20,10 +20,11 @@ function functionHandle = def_phi_4_cwm(robotHandle, c_G, radius)
 %
 % Syntax:  functionHandle = def_phi_4_cwm(robotHandle, c_G, radius)
 %
-% Inputs: robotHandle - Peter Corke's Serial-link robot class;
-%         c_G - 3 dimensional column vector with Cartesian coordinates of the centre 
-%               of the wiping motion relative to the robot global frame and in meters;
-%         radius - radius of the wiping circle in meters.
+% Inputs:
+%     robotHandle - Peter Corke's Serial-link robot class;
+%     c_G - 3 dimensional column vector with Cartesian coordinates of the centre 
+%             of the wiping motion relative to the robot global frame and in meters;
+%     radius - radius of the wiping circle in meters.
 %
 % Outputs:
 %    functionHandle - MatLab function handle with robot configuration 
