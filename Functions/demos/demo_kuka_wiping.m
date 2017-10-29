@@ -114,7 +114,7 @@ model.var = scale.*std(xall,1,1).';
 fprintf(1,'Computing Receptive Fields Centres ...\n');
 stream = RandStream('mlfg6331_64');  % Random number stream for parallel computation
 options = statset('Display','off','MaxIter',200,'UseParallel',1,'UseSubstreams',1,'Streams',stream);
-Nmodels = 50;
+Nmodels = 3;
 [~,C] = kmeans(xall,Nmodels,'Distance','cityblock','EmptyAction','singleton','Start','uniform',...
     'Replicates',10,'OnlinePhase','off','Options', options);
 model.c = C.';
@@ -131,7 +131,7 @@ parfor idx=1:NDem
 end
 R = cell2mat([R_cell{:}].');
 Y = cell2mat([u{:}].');
-B = zeros(size(Phi{1}(x{1}{1}),2),length(model.c));
+B = zeros(size(Phi{1}(x{1}{1}),2),size(model.c,2));
 w = @(m) @(x) exp(-0.5.*sum(bsxfun(@rdivide, bsxfun(@minus,x,model.c(:,m)).^2, model.var))).'; % importance weights W = [w1 w2 ... w_m ... w_M]
 [nRrow,nRcol] = size(R_cell{1}{1});
 parfor m=1:size(model.c,2)
