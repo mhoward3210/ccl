@@ -1,6 +1,5 @@
-% GENERATE_DATA_KUKA_WIPING_MOTION.m - Generates states (robot
-% joint positions) and actions (robot joint velocities) and time for a
-% circular wiping motion as unconstrained policy and planar surface
+% Generates states (robot joint positions) and actions (robot joint velocities)
+% and time for a circular wiping motion as unconstrained policy and planar surface
 % constraints.
 %   Saves the states and actions in file.
 %
