@@ -1,4 +1,4 @@
-function functionHandle = def_phi_4_cwm(robotHandle, c_G, radius)
+function functionHandle = def_phi_4_cwm_sim(robotHandle, c_G, radius)
 % Defines a set of regressors for a unconstrained policy for a circular wiping motion.
 %
 % Consider the decomposition of the robot actions as a main task and
@@ -13,12 +13,12 @@ function functionHandle = def_phi_4_cwm(robotHandle, c_G, radius)
 %       u_pi(x) = Phi(x) * bm;
 %
 % where bm is a matrix of weights, and Phi(x) is a matrix of regressors.
-% def_phi_4_cwm returns a MatLab function handle to a set of regressors
+% def_phi_4_cwm_sim returns a MatLab function handle to a set of regressors
 % suitable for the secondary task of circular motions with specified radius
 % and centre.
 % This regressors are a function of the robot configuration - column vector.
 %
-% Syntax:  functionHandle = def_phi_4_cwm(robotHandle, c_G, radius)
+% Syntax:  functionHandle = def_phi_4_cwm_sim(robotHandle, c_G, radius)
 %
 % Inputs:
 %     robotHandle - Peter Corke's Serial-link robot class;
@@ -44,7 +44,7 @@ function functionHandle = def_phi_4_cwm(robotHandle, c_G, radius)
 %     % Defining unconstrained policy regressors:
 %     centre = [0.1; 0.0; 0.4];
 %     radius = 0.02;
-%     Phi = def_phi_4_cwm(robot, centre, radius);
+%     Phi = def_phi_4_cwm_sim(robot, centre, radius);
 %     % Defining unconstrained policy:
 %     u_pi = @(x) Phi(x)*[1 10];
 %     % Constraint matrix for given robot arm configuration:
@@ -66,11 +66,8 @@ functionHandle = @Phi;
 function output = Phi(q)
     J = robotHandle.jacobe(q); % Robot Jacobian in the end-effector frame.
     Jtask = J(1:2,:); % Jacobian for the x and y coordinates - perpendicular plane to the end-effector.
-    Jtask_inv = pinv(Jtask); % Pseudo-inverse of the task Jacobian.
-    N = eye(length(q)) - (Jtask_inv*Jtask); % Compute null-space projection matrix for given configuration.
     Phi_kappa = getPhi_kappa(robotHandle, c_G, radius); % Regressors for the secondary task.
-    Phi_gamma = @(q) kron([q.' 1],eye(length(q))); % Regressors for the third task.
-    output = [Jtask_inv*Phi_kappa(q) N*Phi_gamma(q)];
+    output = pinv(Jtask)*Phi_kappa(q);
 end
 function functionHandle = getPhi_kappa(robotHandle, c_G, radius)
     functionHandle = @Phi_kappa;

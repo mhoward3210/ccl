@@ -4,8 +4,8 @@
 %   Saves the states and actions in file.
 %
 % Other m-files required: 
-%   def_phi_4_cwm.m
-%   getTaskRegressors4SurfacePerpendicultaMotionSimulated.m
+%   def_phi_4_cwm_sim.m
+%   def_phib_5_spm_sim.m
 %   def_phia_4_spm.m
 %   def_constrained_policy.m
 
@@ -92,7 +92,7 @@ for idx=1:NDem
     A = @(x) W_A*feval(Phi_A,x); % Constraint matrix as a function of configuration
     b = @(x) W_b*feval(Phi_b,x); % main task as a function of the configuration
     % Constrained Policie
-    Phi{idx} = def_phi_4_cwm(robot, c{idx}, r{idx}); % Get regressors for the unconstrained policy
+    Phi{idx} = def_phi_4_cwm_sim(robot, c{idx}, r{idx}); % Get regressors for the unconstrained policy
     unconstrainedPolicy{idx} = @(x) Phi{idx}(x)*[1; 10];
     x_dot = def_constrained_policy(A, b, unconstrainedPolicy{idx});
     % solving motion
