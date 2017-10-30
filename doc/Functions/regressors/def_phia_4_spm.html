@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of def_phia_4_spm</title>
+  <meta name="keywords" content="def_phia_4_spm">
+  <meta name="description" content="Defines suitable regressors for the constraint matrix for a surface perpendicular motion.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">regressors</a> &gt; def_phia_4_spm.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions/regressors&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>def_phia_4_spm
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Defines suitable regressors for the constraint matrix for a surface perpendicular motion.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function functionHandle = def_phia_4_spm(robotHandle) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Defines suitable regressors for the constraint matrix for a surface perpendicular motion.
+
+ Consider a Constraint matrix defined as a linear combination of regressors:
+
+         A(x) = W_A * Phi_A(x),
+
+ where W_A is a matrix of weights, and Phi_A(x) is a matrix of regressors.
+ def_phia_4_spm returns a MatLab function handle to a set of regressors
+ suitable for the constraint of moving the robot end-effector in contact 
+ and perpendicular to a surface.
+ This regressors are a function of the robot configuration - column vector.
+
+ Syntax:  functionHandle = def_phia_4_spm(robotHandle)
+
+ Inputs:
+    robotHandle - Peter Corke's Serial-link robot class
+
+ Outputs:
+    functionHandle - MatLab function handle with robot configuration 
+                     (column vector) as input
+
+ Example: 
+     % Robot Kinematic model specified by the Denavit-Hartenberg.
+     DH = [0.0, 0.31, 0.0, pi/2;
+           0.0, 0.0, 0.0, -pi/2;
+           0.0, 0.4, 0.0, -pi/2;
+           0.0, 0.0, 0.0, pi/2;
+           0.0, 0.39, 0.0, pi/2;
+           0.0, 0.0, 0.0, -pi/2;
+           0.0, 0.21-0.132, 0.0, 0.0];
+     % Peters Cork robotics library has to be installed:
+     robot = SerialLink(DH);
+     % Phi_A(x): vector of regressors for the Constraint matrix as a function
+     % of the state
+     n = [0; 0; 1]; % Cartesian normal of the constraint surface.
+     W_A = blkdiag(n.', n.', n.'); % Constant gain matrix for the Constraint matrix.
+     Phi_A = def_phia_4_spm(robot);
+     % Constraint matrix as a function of configuration.
+     A = @(x) W_A*PhiA(x);
+     % Constraint matrix for given robot arm configuration:
+     disp(A([0;0;0;pi/2;0;-pi/2;0]));
+
+ Libraries required: Peter Corke's Robotics library (MatLab add-on)
+ 
+ See also: <a href="def_phib_4_spm_sim.html" class="code" title="function functionHandle = def_phib_4_spm_sim(robotHandle)">def_phib_4_spm_sim</a>, <a href="def_phib_4_spm_exp.html" class="code" title="function functionHandle = def_phib_4_spm_exp(robotHandle)">def_phib_4_spm_exp</a>, <a href="def_phi_4_cwm.html" class="code" title="function functionHandle = def_phi_4_cwm(robotHandle, c_G, radius)">def_phi_4_cwm</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../Functions/data_generation/generate_data_kuka_wiping.html" class="code" title="">generate_data_kuka_wiping</a>	Generates states (robot joint positions) and actions (robot joint velocities)</li><li><a href="../../Functions/data_generation/test.html" class="code" title="">test</a>	Generates states (robot joint positions) and actions (robot joint velocities)</li><li><a href="../../Functions/demos/demo_kuka_wiping.html" class="code" title="">demo_kuka_wiping</a>	Given the data composed of states - joint positions - and actions - joint</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">functionHandle = @Phi_A;</a></li><li><a href="#_sub2" class="code">function output = Phi_A(q)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function functionHandle = def_phia_4_spm(robotHandle)</a>
+0002 <span class="comment">% Defines suitable regressors for the constraint matrix for a surface perpendicular motion.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Consider a Constraint matrix defined as a linear combination of regressors:</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%         A(x) = W_A * Phi_A(x),</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% where W_A is a matrix of weights, and Phi_A(x) is a matrix of regressors.</span>
+0009 <span class="comment">% def_phia_4_spm returns a MatLab function handle to a set of regressors</span>
+0010 <span class="comment">% suitable for the constraint of moving the robot end-effector in contact</span>
+0011 <span class="comment">% and perpendicular to a surface.</span>
+0012 <span class="comment">% This regressors are a function of the robot configuration - column vector.</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% Syntax:  functionHandle = def_phia_4_spm(robotHandle)</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% Inputs:</span>
+0017 <span class="comment">%    robotHandle - Peter Corke's Serial-link robot class</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% Outputs:</span>
+0020 <span class="comment">%    functionHandle - MatLab function handle with robot configuration</span>
+0021 <span class="comment">%                     (column vector) as input</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% Example:</span>
+0024 <span class="comment">%     % Robot Kinematic model specified by the Denavit-Hartenberg.</span>
+0025 <span class="comment">%     DH = [0.0, 0.31, 0.0, pi/2;</span>
+0026 <span class="comment">%           0.0, 0.0, 0.0, -pi/2;</span>
+0027 <span class="comment">%           0.0, 0.4, 0.0, -pi/2;</span>
+0028 <span class="comment">%           0.0, 0.0, 0.0, pi/2;</span>
+0029 <span class="comment">%           0.0, 0.39, 0.0, pi/2;</span>
+0030 <span class="comment">%           0.0, 0.0, 0.0, -pi/2;</span>
+0031 <span class="comment">%           0.0, 0.21-0.132, 0.0, 0.0];</span>
+0032 <span class="comment">%     % Peters Cork robotics library has to be installed:</span>
+0033 <span class="comment">%     robot = SerialLink(DH);</span>
+0034 <span class="comment">%     % Phi_A(x): vector of regressors for the Constraint matrix as a function</span>
+0035 <span class="comment">%     % of the state</span>
+0036 <span class="comment">%     n = [0; 0; 1]; % Cartesian normal of the constraint surface.</span>
+0037 <span class="comment">%     W_A = blkdiag(n.', n.', n.'); % Constant gain matrix for the Constraint matrix.</span>
+0038 <span class="comment">%     Phi_A = def_phia_4_spm(robot);</span>
+0039 <span class="comment">%     % Constraint matrix as a function of configuration.</span>
+0040 <span class="comment">%     A = @(x) W_A*PhiA(x);</span>
+0041 <span class="comment">%     % Constraint matrix for given robot arm configuration:</span>
+0042 <span class="comment">%     disp(A([0;0;0;pi/2;0;-pi/2;0]));</span>
+0043 <span class="comment">%</span>
+0044 <span class="comment">% Libraries required: Peter Corke's Robotics library (MatLab add-on)</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">% See also: def_phib_4_spm_sim, def_phib_4_spm_exp, def_phi_4_cwm</span>
+0047 
+0048 <span class="comment">% Author: Joao Moura</span>
+0049 <span class="comment">% Edinburgh Centre for Robotics, Edinburgh, UK</span>
+0050 <span class="comment">% email address: Joao.Moura@ed.ac.uk</span>
+0051 <span class="comment">% Website: http://www.edinburgh-robotics.org/students/joao-moura</span>
+0052 <span class="comment">% October 2017; Last revision: 28-Oct-2017</span>
+0053 
+0054 <span class="comment">%------------- BEGIN CODE --------------</span>
+0055 <a name="_sub1" href="#_subfunctions" class="code">functionHandle = @Phi_A;</a>
+0056 <a name="_sub2" href="#_subfunctions" class="code">function output = Phi_A(q)</a>
+0057     J = robotHandle.jacob0(q); <span class="comment">% Robot Jacobian in the global reference frame.</span>
+0058     JtT = J(1:3,:); <span class="comment">% Jacobian for the end-effector position.</span>
+0059     Jrot = J(4:6,:); <span class="comment">% Rotation component of Jacobian.</span>
+0060     rot = t2r(robotHandle.fkine(q)); <span class="comment">% End-effector orientation (rotation matrix).</span>
+0061     xT = rot(:,1); yT = rot(:,2); <span class="comment">% Unit vectors that define the plane perpendicular to end-effector.</span>
+0062     JxT = -skew(xT)*Jrot; JyT = -skew(yT)*Jrot; <span class="comment">% Jacobians for the end-effector frame unit vectors.</span>
+0063     output = [JtT; JxT; JyT];
+0064 <span class="keyword">end</span>
+0065 <span class="comment">%------------- END OF CODE --------------</span>
+0066 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 30-Oct-2017 17:46:26 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

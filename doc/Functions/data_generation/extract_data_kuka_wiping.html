@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of extract_data_kuka_wiping</title>
+  <meta name="keywords" content="extract_data_kuka_wiping">
+  <meta name="description" content="EXTRACT_DATA_KUKA_WIPING.m - Extracts the joint positions  and the time">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">data_generation</a> &gt; extract_data_kuka_wiping.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions/data_generation&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>extract_data_kuka_wiping
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>EXTRACT_DATA_KUKA_WIPING.m - Extracts the joint positions  and the time</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> EXTRACT_DATA_KUKA_WIPING.m - Extracts the joint positions  and the time 
+ from the mat files that were previously generated from the ROS bag files
+
+ Other m-files required: bag2matlab.m - to convert ROS bag files into mat
+ files</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% EXTRACT_DATA_KUKA_WIPING.m - Extracts the joint positions  and the time</span>
+0002 <span class="comment">% from the mat files that were previously generated from the ROS bag files</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Other m-files required: bag2matlab.m - to convert ROS bag files into mat</span>
+0005 <span class="comment">% files</span>
+0006 
+0007 <span class="comment">% Author: Joao Moura</span>
+0008 <span class="comment">% Edinburgh Centre for Robotics, Edinburgh, UK</span>
+0009 <span class="comment">% email address: Joao.Moura@ed.ac.uk</span>
+0010 <span class="comment">% Website: http://www.edinburgh-robotics.org/students/joao-moura</span>
+0011 <span class="comment">% October 2017; Last revision: 25-Oct-2017</span>
+0012 
+0013 <span class="comment">%% User Input</span>
+0014 files_directory = <span class="string">'../../../Leo_code_test/joao_library/demonstrations_mat/'</span>;
+0015 N_cut = 100; <span class="comment">% initial N samples to be ignored due to initial adaptation to path</span>
+0016 data_file_name = <span class="string">'data.mat'</span>;
+0017 NDem = 12; <span class="comment">% number of demonstrations to store (&lt; number of files in dir)</span>
+0018 
+0019 
+0020 <span class="comment">%% Get data</span>
+0021 file_names = dir(strcat(files_directory,<span class="string">'2017*.mat'</span>)); <span class="comment">% get data from real</span>
+0022 <span class="comment">% robot (previously converted from bag file to *.mat file)</span>
+0023 Nfiles = length(file_names); <span class="comment">% number of *.mat files in the specified directory</span>
+0024 <span class="comment">% Condition to assert if the NDem is not &gt; number of files</span>
+0025 <span class="keyword">if</span> NDem &gt; Nfiles; NDem = Nfiles; <span class="keyword">end</span>
+0026 x = cell(1, NDem); <span class="comment">% store state (robot configuration)</span>
+0027 u = cell(1, NDem); <span class="comment">% store input (configuration velocity)</span>
+0028 t = cell(1, NDem); <span class="comment">% store time</span>
+0029 <span class="comment">% Loop to extract and save data</span>
+0030 <span class="keyword">for</span> i=1:NDem
+0031     file_name = file_names(i).name;
+0032     fprintf(1,<span class="string">'Processing file %i: %s ...\n'</span>,i,file_name);
+0033     load(strcat(files_directory,file_name)); <span class="comment">% get data from 1 demonstration</span>
+0034     q_i = cell2mat(data_struct.jointPosition); <span class="comment">% joint angles</span>
+0035     dt_i = data_struct.dT(2:end);
+0036     x{i} = num2cell(q_i(2:<span class="keyword">end</span>,:).',1); <span class="comment">% save state: joint angles</span>
+0037     u{i} = num2cell((diff(q_i)./dt_i).',1); <span class="comment">% save input: joint velocities</span>
+0038     t{i} = num2cell(cumsum(dt_i).',1); <span class="comment">% demonstration time</span>
+0039     <span class="comment">% cut initial samples</span>
+0040     x{i} = x{i}(N_cut:end);
+0041     u{i} = u{i}(N_cut:end);
+0042     t{i} = t{i}(N_cut:end); 
+0043 <span class="keyword">end</span>
+0044 save(data_file_name,<span class="string">'x'</span>,<span class="string">'u'</span>,<span class="string">'t'</span>);</pre></div>
+<hr><address>Generated on Mon 30-Oct-2017 17:46:26 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

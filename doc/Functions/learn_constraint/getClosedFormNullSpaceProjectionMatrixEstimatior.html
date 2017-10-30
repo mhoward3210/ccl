@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getClosedFormNullSpaceProjectionMatrixEstimatior</title>
+  <meta name="keywords" content="getClosedFormNullSpaceProjectionMatrixEstimatior">
+  <meta name="description" content="number of the regressors of the constraint function">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">learn_constraint</a> &gt; getClosedFormNullSpaceProjectionMatrixEstimatior.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions/learn_constraint&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getClosedFormNullSpaceProjectionMatrixEstimatior
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>number of the regressors of the constraint function</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [nullSpaceProjectionHat, WA_hat, Wb_hat] = ClosedFormNullSpaceProjectionMatrixEstimatior(q, u) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> number of the regressors of the constraint function</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../Functions/subfunctions/def_null_space_proj.html" class="code" title="function functionHandle = def_null_space_proj(constraintMatrix)">def_null_space_proj</a>	Defines null space projection matrix.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../Functions/demos/demo_kuka_wiping.html" class="code" title="">demo_kuka_wiping</a>	Given the data composed of states - joint positions - and actions - joint</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function functionHandle = getClosedFormNullSpaceProjectionMatrixEstimatior(Phi_A, Phi_b, ConstraintDim)</a>
+0002     <a name="_sub1" href="#_subfunctions" class="code">functionHandle = @ClosedFormNullSpaceProjectionMatrixEstimatior;</a>
+0003 
+0004     <a name="_sub2" href="#_subfunctions" class="code">function [nullSpaceProjectionHat, WA_hat, Wb_hat] = ClosedFormNullSpaceProjectionMatrixEstimatior(q, u)</a>
+0005         <span class="comment">% number of the regressors of the constraint function</span>
+0006         Ndata = length(q);
+0007         Ndof = length(q{1});
+0008         NA = size(Phi_A(zeros(Ndof,1)),1);
+0009         Nb = size(Phi_b(zeros(Ndof,1)),1); 
+0010         <span class="comment">% Evaluate constraint and task regressors for all the data</span>
+0011         HH = zeros(NA+Nb,Ndata);
+0012         parfor idx=1:Ndata
+0013             <span class="comment">% H(q,u): Matrix of regressors as a function of the configuration and action compute number of regressors</span>
+0014             HH(:,idx) = [feval(Phi_A, q{idx})*u{idx}; -feval(Phi_b,q{idx})];
+0015         <span class="keyword">end</span>
+0016         <span class="comment">% Singular value decomposition to estimate the gains</span>
+0017         [U,~,~]=svd(HH);
+0018         W_hat = U(:,(end-(ConstraintDim-1)):end).'; <span class="comment">% select the last ConstraintDim columns</span>
+0019         WA_hat = W_hat(:,1:NA);
+0020         Wb_hat = W_hat(:,(NA+1):end);
+0021         <span class="comment">% Definition of Constraint matrix and main task</span>
+0022         A_hat = @(q) WA_hat*Phi_A(q); <span class="comment">% Constraint matrix as a function of configuration</span>
+0023         nullSpaceProjectionHat = <a href="../../Functions/subfunctions/def_null_space_proj.html" class="code" title="function functionHandle = def_null_space_proj(constraintMatrix)">def_null_space_proj</a>(A_hat);
+0024     <span class="keyword">end</span>
+0025 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 30-Oct-2017 17:46:26 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>
