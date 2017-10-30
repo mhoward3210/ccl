@@ -1,9 +1,8 @@
-% DEMO_KUKA_WIPING_POLICY.m - given the data composed of states - joint
-% positions - and actions - joint velocities, we estimate the null space
-% projection matrix for each data set/demonstration and use that result to
-% compute the unconstrained policy. We then plot the result of the
-% policy and estimated projection matrix with the input data for the kuka
-% end-effector cartesian positions.
+% Given the data composed of states - joint positions - and actions - joint
+% velocities, we estimate the null space projection matrix for each data 
+% set/demonstration and use that result to compute the unconstrained policy.
+% We then plot the result of the policy and estimated projection matrix with 
+% the input data for the kuka end-effector cartesian positions.
 %
 % Other m-files required: 
 %   def_phi_4_cwm.m
@@ -92,8 +91,10 @@ end
 fprintf(1,'Estimating constraints ...\n');
 N_Estimator = getClosedFormNullSpaceProjectionMatrixEstimatior(Phi_A, Phi_b, 3);
 N_hat = cell(1,NDem);
+WA_hat = cell(1,NDem);
+Wb_hat = cell(1,NDem);
 parfor idx=1:NDem
-    N_hat{idx} = feval(N_Estimator, x{idx}, u{idx});
+    [N_hat{idx}, WA_hat{idx}, Wb_hat{idx}] = feval(N_Estimator, x{idx}, u{idx});
 end
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
@@ -114,7 +115,7 @@ model.var = scale.*std(xall,1,1).';
 fprintf(1,'Computing Receptive Fields Centres ...\n');
 stream = RandStream('mlfg6331_64');  % Random number stream for parallel computation
 options = statset('Display','off','MaxIter',200,'UseParallel',1,'UseSubstreams',1,'Streams',stream);
-Nmodels = 3;
+Nmodels = 25;
 [~,C] = kmeans(xall,Nmodels,'Distance','cityblock','EmptyAction','singleton','Start','uniform',...
     'Replicates',10,'OnlinePhase','off','Options', options);
 model.c = C.';
