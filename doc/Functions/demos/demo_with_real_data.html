@@ -1,0 +1,220 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of demo_with_real_data</title>
+  <meta name="keywords" content="demo_with_real_data">
+  <meta name="description" content="demo_with_real_data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">demos</a> &gt; demo_with_real_data.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions/demos&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>demo_with_real_data
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>demo_with_real_data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function demo_with_real_data </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> demo_with_real_data
+ A demonstration of using CCL library with real data from Trakstar sensor.
+ The data is x,y,z position in the operational space. The operator
+ attached one sensor on the finger tip and slided on different surface
+ constraints.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../Functions/evaluation/get_poe_alpha.html" class="code" title="function [nPOE, vPOE, uPOE] = get_poe_alpha (f_proj, X, NS_t)">get_poe_alpha</a>	[nPOE, vPOE, uPOE] = get_poe_alpha (f_proj, X, NS_t)</li><li><a href="../../Functions/learn_constraint/learn_alpha_ccl.html" class="code" title="function [optimal] = learn_alpha_ccl (Un, X, options)">learn_alpha_ccl</a>	[optimal] = learn_alpha_ccl (Un, X, options)</li><li><a href="../../Functions/subfunctions/load_data_ccl.html" class="code" title="function D = load_data_ccl(filename)">load_data_ccl</a>	D = load_data(filename)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function demo_with_real_data</a>
+0002 <span class="comment">% demo_with_real_data</span>
+0003 <span class="comment">% A demonstration of using CCL library with real data from Trakstar sensor.</span>
+0004 <span class="comment">% The data is x,y,z position in the operational space. The operator</span>
+0005 <span class="comment">% attached one sensor on the finger tip and slided on different surface</span>
+0006 <span class="comment">% constraints.</span>
+0007 clear all;clc;close all; rng(3);
+0008 fprintf(<span class="string">'&lt;=========================================================================&gt;\r'</span>);
+0009 fprintf(<span class="string">'&lt;=========================================================================&gt;\r'</span>);
+0010 fprintf(<span class="string">'&lt;===========   Constraint Consistent Learning Library    =================&gt;\r'</span>);
+0011 fprintf(<span class="string">'&lt; This demo will demonstrate the CCL toolbox using real data from Trakstar&gt;\r'</span>);
+0012 fprintf(<span class="string">'&lt; The CCL is formulated in the following format:                          &gt; \r'</span>);
+0013 fprintf(<span class="string">'&lt; Consider the set of consistent k-dimensional constraints:               &gt;\r'</span>);
+0014 fprintf(<span class="string">'&lt;                  A(x)U(x) = b(x)                                        &gt;\r'</span>);
+0015 fprintf(<span class="string">'&lt;                      U(x) = pinv(A(x))b(x) + (I-pinv(A(x))A(x))Pi(x)    &gt;\r'</span>);
+0016 fprintf(<span class="string">'&lt;                      U(x) =      U_ts      +         U_ns               &gt;\r'</span>);
+0017 fprintf(<span class="string">'&lt; The task is defined in 2D. The constraints are either random or state   &gt;\r'</span>);
+0018 fprintf(<span class="string">'&lt; dependant parabola. The null space control policies are either linear   &gt;\r'</span>);
+0019 fprintf(<span class="string">'&lt; attractor or limit cycle. This demo will execute section by section and &gt;\r'</span>);
+0020 fprintf(<span class="string">'&lt; allow the user to configure the training parameters.                    &gt;\r'</span>);
+0021 fprintf(<span class="string">'&lt; List of sections:                                                       &gt;\r'</span>);
+0022 fprintf(<span class="string">'&lt; SECTION 1:       PARAMETER CONFIGURATION                                &gt;\r'</span>);
+0023 fprintf(<span class="string">'&lt; SECTION 2:       LEARNING NULL SPACE CONSTRAINTS                        &gt;\r'</span>);
+0024 fprintf(<span class="string">'&lt; Configuration options:                                                  &gt;\r'</span>);
+0025 fprintf(<span class="string">'&lt; Constraints:                                                            &gt;\r'</span>);
+0026 fprintf(<span class="string">'&lt;            State independant:                                           &gt;\r'</span>);
+0027 fprintf(<span class="string">'&lt;                              linear(random)                             &gt;\r'</span>);
+0028 fprintf(<span class="string">'&lt;              State dependant:                                           &gt;\r'</span>);
+0029 fprintf(<span class="string">'&lt;                              parabola                                   &gt;\r'</span>);
+0030 fprintf(<span class="string">'&lt; Null space policy:                                                      &gt;\r'</span>);
+0031 fprintf(<span class="string">'&lt;                  circular policy demonstrated by human                  &gt;\r'</span>);
+0032 fprintf(<span class="string">'&lt;=========================================================================&gt;\r'</span>);
+0033 fprintf(<span class="string">'&lt;=========================================================================&gt;\r'</span>);
+0034 fprintf(<span class="string">'&lt;=========================================================================&gt;\n\n\n'</span>);
+0035 fprintf(<span class="string">'&lt;=========================================================================&gt;\n'</span>);
+0036 fprintf(<span class="string">'&lt;=========================================================================&gt;\n'</span>);
+0037 fprintf(<span class="string">'&lt;=========================================================================&gt;\n'</span>);
+0038 fprintf(<span class="string">'&lt; SECTION 1:       PARAMETER CONFIGURATION                                &gt;\r'</span>);
+0039 fprintf(<span class="string">'\n&lt; User specified configurations are:                                      &gt;\r'</span>);
+0040 <span class="comment">%% GENERATIVE MODEL PARAMETERS</span>
+0041 ctr = 1*ones(1,3);                                              <span class="comment">% colour for training data</span>
+0042 cte  = [0  0  0];                                               <span class="comment">% colour for testing data</span>
+0043 settings.dim_x          = 3 ;                                   <span class="comment">% dimensionality of the state space</span>
+0044 settings.dim_u          = 3 ;                                   <span class="comment">% dimensionality of the action space</span>
+0045 settings.dim_r          = 3 ;                                   <span class="comment">% dimensionality of the task space</span>
+0046 settings.dim_k          = 1 ;                                   <span class="comment">% dimensionality of the constraint</span>
+0047 settings.dt             = 0.02;                                 <span class="comment">% time step</span>
+0048 settings.projection = <span class="string">'state_dependant'</span>;                      <span class="comment">% {'state_independant' 'state_dependant'}</span>
+0049 settings.null_policy_type = <span class="string">'circle'</span>;                           <span class="comment">% {'circle'}</span>
+0050 
+0051 fprintf(<span class="string">'&lt; Dim_x             = %d                                                   &gt;\r'</span>,settings.dim_x);
+0052 fprintf(<span class="string">'&lt; Dim_u             = %d                                                   &gt;\r'</span>,settings.dim_u);
+0053 fprintf(<span class="string">'&lt; Dim_r             = %d                                                   &gt;\r'</span>,settings.dim_r);
+0054 fprintf(<span class="string">'&lt; Dim_k             = %d                                                   &gt;\r'</span>,settings.dim_k);
+0055 fprintf(<span class="string">'&lt; Constraint        = %s                                                   &gt;\r'</span>,settings.projection);
+0056 fprintf(<span class="string">'&lt; Null_policy_type  = %s                                                   &gt;\r'</span>,settings.null_policy_type);
+0057 
+0058 fprintf(<span class="string">'&lt;=========================================================================&gt;\n'</span>);
+0059 fprintf(<span class="string">'&lt;=========================================================================&gt;\n'</span>);
+0060 fprintf(<span class="string">'&lt;=========================================================================&gt;\n'</span>);
+0061 pause();
+0062 
+0063 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0064 <span class="comment">%%                                            LEARN CONSTRAINTS                                       %%</span>
+0065 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0066 fprintf(<span class="string">'\n\n\n&lt;=========================================================================&gt;\n'</span>);
+0067 fprintf(<span class="string">'&lt;=========================================================================&gt;\n'</span>);
+0068 fprintf(<span class="string">'&lt;=========================================================================&gt;\n'</span>);
+0069 fprintf(<span class="string">'&lt; SECTION 2:       LEARNING NULL SPACE CONSTRAINTS                        &gt;\r'</span>);
+0070 fprintf(<span class="string">'&lt; In this section,we will start addressing state independant constraint A &gt;\r'</span>);
+0071 fprintf(<span class="string">'&lt; and then state dependant constraint A(x). The exploration policy will   &gt;\r'</span>);
+0072 fprintf(<span class="string">'&lt; change the performance of the learnt constraint                         &gt;\r'</span>);
+0073 fprintf(<span class="string">'&lt; The cost function to be minimised is:                                   &gt;\r'</span>);
+0074 fprintf(<span class="string">'&lt;                           E[A] = min(sum||A*Un||^2)                     &gt;\n'</span>);
+0075 fprintf(<span class="string">'\n&lt; For details please refer to:                                            &gt;\r'</span>);
+0076 fprintf(<span class="string">'&lt; H.-C. Lin, M. Howard, and S. Vijayakumar. IEEE International Conference &gt;\r'</span>);
+0077 fprintf(<span class="string">'&lt; Robotics and Automation, 2015                                           &gt;\n'</span>);
+0078 
+0079 <span class="keyword">if</span> strcmp(settings.projection,<span class="string">'state_independant'</span>)
+0080     fprintf(1,<span class="string">'\n&lt; Start learning state independant null space projection   ...            &gt; \n'</span>);
+0081     N_tr                    = 0.7;
+0082     N_te                    = 0.3;
+0083     options.dim_b           = 5;
+0084     options.dim_r           = 3;
+0085     <span class="comment">% generating training and testing dataset</span>
+0086     fprintf(<span class="string">'&lt; Generating training and testingdataset for learning constraints    ...  &gt;\r'</span>);
+0087     Data = <a href="../../Functions/subfunctions/load_data_ccl.html" class="code" title="function D = load_data_ccl(filename)">load_data_ccl</a>(<span class="string">'planer_circle'</span>);
+0088     [ind_tr,ind_te] = dividerand(Data.N,N_tr,N_te,0) ;
+0089     Xtr = Data.X(:,ind_tr);Ytr = Data.Y(:,ind_tr);
+0090     Xte = Data.X(:,ind_te);Yte = Data.Y(:,ind_te);
+0091     fprintf(1,<span class="string">'#Data (train): %5d, \r'</span>,size(Xtr,2));
+0092     fprintf(1,<span class="string">'#Data (test): %5d, \n'</span>,size(Xte,2));
+0093     fprintf(1,<span class="string">'\t Dimensionality of action space: %d \n'</span>, settings.dim_u) ;
+0094     fprintf(1,<span class="string">'\t Dimensionality of task space:   %d \n'</span>, settings.dim_k) ;
+0095     fprintf(1,<span class="string">'\t Dimensionality of null space:   %d \n'</span>, settings.dim_u-settings.dim_k) ;
+0096     fprintf(1,<span class="string">'\t Size of the training data:      %d \n'</span>, size(Xtr,2)) ;
+0097     fprintf(1,<span class="string">'\n Learning state-independent constraint vectors  ... \n'</span>) ;
+0098     
+0099     model  = <a href="../../Functions/learn_constraint/learn_alpha_ccl.html" class="code" title="function [optimal] = learn_alpha_ccl (Un, X, options)">learn_alpha_ccl</a> (Ytr,Xtr,options);
+0100     fprintf(1,<span class="string">'\n Result %d \n'</span>) ;
+0101     fprintf(1,<span class="string">'\t ===============================\n'</span> ) ;
+0102     fprintf(1,<span class="string">'\t       |    NPOE    VPOE    UPOE\n'</span> ) ;
+0103     fprintf(1,<span class="string">'\t -------------------------------\n'</span> ) ;
+0104     [nPOE,vPOE,uPOE] = <a href="../../Functions/evaluation/get_poe_alpha.html" class="code" title="function [nPOE, vPOE, uPOE] = get_poe_alpha (f_proj, X, NS_t)">get_poe_alpha</a> (model.f_proj, Xtr, Ytr) ;
+0105     fprintf(1,<span class="string">'\t Train |  %4.2e  %4.2e  %4.2e \n'</span>,  nPOE, sum(vPOE), uPOE ) ;
+0106     nPOE = <a href="../../Functions/evaluation/get_poe_alpha.html" class="code" title="function [nPOE, vPOE, uPOE] = get_poe_alpha (f_proj, X, NS_t)">get_poe_alpha</a> (model.f_proj, Xte, Yte) ;
+0107     fprintf(1,<span class="string">'\t Test  |  %4.2e  %4.2e  %4.2e  \n'</span>,  nPOE, sum(vPOE), uPOE ) ;
+0108     fprintf(1,<span class="string">'\t ===============================\n'</span> ) ;
+0109     figure;scatter3(Xtr(1,:),Xtr(2,:),Xtr(3,:),<span class="string">'filled'</span>,<span class="string">'MarkerEdgeColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0110         <span class="string">'MarkerFaceColor'</span>,ctr);hold on;
+0111     scatter3(Xte(1,:),Xte(2,:),Xte(3,:),<span class="string">'MarkerEdgeColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0112         <span class="string">'MarkerFaceColor'</span>,cte);
+0113     zlim([0,1]);xlabel(<span class="string">'x'</span>);ylabel(<span class="string">'y'</span>);zlabel(<span class="string">'z'</span>);title(<span class="string">'Training (black) &amp; Testing (white) data visualisation'</span>);
+0114     <span class="keyword">for</span> n = 1:size(Yte,2)
+0115         NS_p(:,n) = model.f_proj(Xte(:,n)) * Yte(:,n) ;
+0116     <span class="keyword">end</span>
+0117     figure;plot(real(NS_p(1,:)));hold on;plot(Yte(1,:)); legend(<span class="string">'prediction'</span>,<span class="string">'true observation'</span>);title(<span class="string">'Prediciton VS True observation'</span>); xlabel(<span class="string">'Time step'</span>); ylabel(<span class="string">'Y1'</span>);
+0118     figure;plot(real(NS_p(2,:)));hold on;plot(Yte(2,:)); legend(<span class="string">'prediction'</span>,<span class="string">'true observation'</span>);title(<span class="string">'Prediciton VS True observation'</span>); xlabel(<span class="string">'Time step'</span>); ylabel(<span class="string">'Y2'</span>);
+0119     figure;plot(real(NS_p(3,:)));hold on;plot(Yte(3,:)); legend(<span class="string">'prediction'</span>,<span class="string">'true observation'</span>);title(<span class="string">'Prediciton VS True observation'</span>); xlabel(<span class="string">'Time step'</span>); ylabel(<span class="string">'Y3'</span>);
+0120     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0121 <span class="keyword">elseif</span> strcmp(settings.projection, <span class="string">'state_dependant'</span>)
+0122     fprintf(1,<span class="string">'\n&lt; Start learning state dependant null space projection   ...              &gt; \n'</span>);
+0123     N_tr                    = 0.7;
+0124     N_te                    = 0.3;
+0125     options.dim_b           = 5;
+0126     options.dim_r           = 3;
+0127     <span class="comment">% generating training dataset</span>
+0128     fprintf(<span class="string">'&lt; Generating training and testingdataset for learning constraints    ... &gt;\r'</span>);
+0129     Data = <a href="../../Functions/subfunctions/load_data_ccl.html" class="code" title="function D = load_data_ccl(filename)">load_data_ccl</a>(<span class="string">'curve_circle'</span>);
+0130     [ind_tr,ind_te] = dividerand(Data.N,N_tr,N_te,0) ;
+0131     Xtr = Data.X(:,ind_tr);Ytr = Data.Y(:,ind_tr);
+0132     Xte = Data.X(:,ind_te);Yte = Data.Y(:,ind_te);
+0133     fprintf(1,<span class="string">'#Data (train): %5d, \r'</span>,size(Xtr,2));
+0134     fprintf(1,<span class="string">'#Data (test): %5d, \n'</span>,size(Xte,2));
+0135     fprintf(1,<span class="string">'\t Dimensionality of action space: %d \n'</span>, settings.dim_u) ;
+0136     fprintf(1,<span class="string">'\t Dimensionality of task space:   %d \n'</span>, settings.dim_k) ;
+0137     fprintf(1,<span class="string">'\t Dimensionality of null space:   %d \n'</span>, settings.dim_u-settings.dim_k) ;
+0138     fprintf(1,<span class="string">'\t Size of the training data:      %d \n'</span>, size(Xtr,2)) ;
+0139     fprintf(1,<span class="string">'\n Learning state-dependent constraint vectors... \n'</span>) ;
+0140     
+0141     model  = <a href="../../Functions/learn_constraint/learn_alpha_ccl.html" class="code" title="function [optimal] = learn_alpha_ccl (Un, X, options)">learn_alpha_ccl</a> (Ytr,Xtr,options);
+0142     
+0143     fprintf(1,<span class="string">'\n Result %d \n'</span>) ;
+0144     fprintf(1,<span class="string">'\t ===============================\n'</span> ) ;
+0145     fprintf(1,<span class="string">'\t       |    NPOE    VPOE    UPOE\n'</span> ) ;
+0146     fprintf(1,<span class="string">'\t -------------------------------\n'</span> ) ;
+0147     [nPOE,vPOE,uPOE] = <a href="../../Functions/evaluation/get_poe_alpha.html" class="code" title="function [nPOE, vPOE, uPOE] = get_poe_alpha (f_proj, X, NS_t)">get_poe_alpha</a> (model.f_proj, Xtr, Ytr) ;
+0148     fprintf(1,<span class="string">'\t Train |  %4.2e  %4.2e  %4.2e \n'</span>,  nPOE, sum(vPOE), uPOE ) ;
+0149     nPOE = <a href="../../Functions/evaluation/get_poe_alpha.html" class="code" title="function [nPOE, vPOE, uPOE] = get_poe_alpha (f_proj, X, NS_t)">get_poe_alpha</a> (model.f_proj, Xte, Yte) ;
+0150     fprintf(1,<span class="string">'\t Test  |  %4.2e  %4.2e  %4.2e  \n'</span>,  nPOE, sum(vPOE), uPOE ) ;
+0151     fprintf(1,<span class="string">'\t ===============================\n'</span> ) ;
+0152     figure;scatter3(Xtr(1,:),Xtr(2,:),Xtr(3,:),<span class="string">'filled'</span>,<span class="string">'MarkerEdgeColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0153         <span class="string">'MarkerFaceColor'</span>,ctr);hold on;
+0154     scatter3(Xte(1,:),Xte(2,:),Xte(3,:),<span class="string">'MarkerEdgeColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0155         <span class="string">'MarkerFaceColor'</span>,cte);
+0156     xlabel(<span class="string">'x'</span>);ylabel(<span class="string">'y'</span>);zlabel(<span class="string">'z'</span>);title(<span class="string">'Training (black) &amp; Testing (white) data visualisation'</span>);
+0157     <span class="keyword">for</span> n = 1:size(Yte,2)
+0158         NS_p(:,n) = model.f_proj(Xte(:,n)) * Yte(:,n) ;
+0159     <span class="keyword">end</span>
+0160     figure;plot(real(NS_p(1,:)));hold on;plot(Yte(1,:)); legend([<span class="string">'prediction'</span>,<span class="string">'true observation'</span>]);title(<span class="string">'Prediciton VS True observation'</span>); xlabel(<span class="string">'Time step'</span>); ylabel(<span class="string">'Y1'</span>);
+0161     figure;plot(real(NS_p(2,:)));hold on;plot(Yte(2,:)); legend([<span class="string">'prediction'</span>,<span class="string">'true observation'</span>]);title(<span class="string">'Prediciton VS True observation'</span>); xlabel(<span class="string">'Time step'</span>); ylabel(<span class="string">'Y2'</span>);
+0162     figure;plot(real(NS_p(3,:)));hold on;plot(Yte(3,:)); legend([<span class="string">'prediction'</span>,<span class="string">'true observation'</span>]);title(<span class="string">'Prediciton VS True observation'</span>); xlabel(<span class="string">'Time step'</span>); ylabel(<span class="string">'Y3'</span>);
+0163 <span class="keyword">end</span>
+0164 fprintf(<span class="string">'&lt;=========================================================================&gt;\n'</span>);
+0165 fprintf(<span class="string">'&lt;=========================================================================&gt;\n'</span>);
+0166 fprintf(<span class="string">'&lt;=========================================================================&gt;\n'</span>);
+0167 pause();
+0168 close all;
+0169 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 30-Oct-2017 17:46:26 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

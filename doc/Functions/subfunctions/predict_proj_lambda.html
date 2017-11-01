@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of predict_proj_lambda</title>
+  <meta name="keywords" content="predict_proj_lambda">
+  <meta name="description" content="N = predict_proj (model, q, Iu)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">subfunctions</a> &gt; predict_proj_lambda.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions/subfunctions&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>predict_proj_lambda
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>N = predict_proj (model, q, Iu)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function N = predict_proj_lambda (q, model, J, Iu) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> N = predict_proj (model, q, Iu)
+ Prediction of the projection matrix
+ Our model predicts the constraint parameters. this function is used to
+ reconstuct the projection matrix from constraint paramters.
+
+ Input:
+   model                                   Parametric model parameters
+   q                                       Joint state data
+   Iu                                      Identity matrix
+
+ Output:
+   N                                       Null space projection</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="get_rotation_matrix.html" class="code" title="function R = get_rotation_matrix(theta_k, current_Rn, search, alpha_id)">get_rotation_matrix</a>	R = get_rotation_matrix(theta_k, current_Rn, search, alpha_id)</li><li><a href="get_unit_vector_from_matrix.html" class="code" title="function alpha = get_unit_vector_from_matrix (Theta)">get_unit_vector_from_matrix</a>	alpha = get_unit_vector_from_matrix (Theta)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../Functions/learn_constraint/learn_lambda_ccl.html" class="code" title="function [optimal] = learn_lambda_ccl (Un, X, J, options)">learn_lambda_ccl</a>	[optimal] = learn_lambda_ccl (Un, X, J, options)</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function N = predict_proj_lambda (q, model, J, Iu)</a>
+0002 <span class="comment">% N = predict_proj (model, q, Iu)</span>
+0003 <span class="comment">% Prediction of the projection matrix</span>
+0004 <span class="comment">% Our model predicts the constraint parameters. this function is used to</span>
+0005 <span class="comment">% reconstuct the projection matrix from constraint paramters.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Input:</span>
+0008 <span class="comment">%   model                                   Parametric model parameters</span>
+0009 <span class="comment">%   q                                       Joint state data</span>
+0010 <span class="comment">%   Iu                                      Identity matrix</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Output:</span>
+0013 <span class="comment">%   N                                       Null space projection</span>
+0014 
+0015 Rn      = Iu ;                                  <span class="comment">% Initial rotation matrix</span>
+0016 Lambda  = zeros(model.dim_k, model.dim_r) ;     <span class="comment">% Initial selection matrix</span>
+0017 
+0018 <span class="keyword">for</span> k = 1:model.dim_k
+0019     theta       = [pi/2 * ones(1,k-1) ,  (model.w{k} * model.phi(q) )' ] ;
+0020     alpha       = <a href="get_unit_vector_from_matrix.html" class="code" title="function alpha = get_unit_vector_from_matrix (Theta)">get_unit_vector_from_matrix</a>(theta) ;                      <span class="comment">% the kth alpha_0</span>
+0021     Lambda(k,:) = alpha * Rn ;                                  <span class="comment">% rotate alpha_0 to get the kth constraint</span>
+0022     Rn          = <a href="get_rotation_matrix.html" class="code" title="function R = get_rotation_matrix(theta_k, current_Rn, search, alpha_id)">get_rotation_matrix</a> (theta, Rn, model, k) ;   <span class="comment">% update rotation matrix for (k+1)</span>
+0023 <span class="keyword">end</span>
+0024 A = Lambda * J(q) ;
+0025 N = eye(model.dim_u) - pinv(A)*A ;
+0026 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 30-Oct-2017 17:46:26 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

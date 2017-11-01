@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of jacobian</title>
+  <meta name="keywords" content="jacobian">
+  <meta name="description" content="J = jacobian (q,L)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">subfunctions</a> &gt; jacobian.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions/subfunctions&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>jacobian
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>J = jacobian (q,L)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function J = jacobian (q, L) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> J = jacobian (q,L)
+ Jacobian calculation
+ Input:
+   q               Joint state variable
+   L               Link length
+ Output:
+   J               Jacobian</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../Functions/data_generation/generate_data_ccl.html" class="code" title="function data = generate_data_ccl (settings)">generate_data_ccl</a>	data = generate_alpha_ccl (settings)</li><li><a href="../../Functions/demos/demo_2_link_arm.html" class="code" title="function demo_2_link_arm">demo_2_link_arm</a>	demo_2_link_arm</li><li><a href="visualise_sbs.html" class="code" title="function SbS_vis (settings,f_project)">visualise_sbs</a>	SbS_vis (settings)</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function J = jacobian (q, L)</a>
+0002 <span class="comment">% J = jacobian (q,L)</span>
+0003 <span class="comment">% Jacobian calculation</span>
+0004 <span class="comment">% Input:</span>
+0005 <span class="comment">%   q               Joint state variable</span>
+0006 <span class="comment">%   L               Link length</span>
+0007 <span class="comment">% Output:</span>
+0008 <span class="comment">%   J               Jacobian</span>
+0009 J(1,1) = -L(1)*sin(q(1,:)) - L(2)*sin(q(1,:)+q(2,:)) ;
+0010 J(1,2) =                   - L(2)*sin(q(1,:)+q(2,:)) ;
+0011 J(2,1) =  L(1)*cos(q(1,:)) + L(2)*cos(q(1,:)+q(2,:)) ;
+0012 J(2,2) =                     L(2)*cos(q(1,:)+q(2,:)) ;
+0013 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 30-Oct-2017 17:46:26 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>
