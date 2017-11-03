@@ -74,10 +74,10 @@ N_Estimator = def_constraint_estimator(Phi_A, Phi_b,...
                         'system_type','forced_action',...
                         'constraint_dim',3);
 N_hat = cell(1,NDem);
-WA_hat = cell(1,NDem);
-Wb_hat = cell(1,NDem);
+H_cell = cell(1,NDem);
+W_hat = cell(1,NDem);
 for idx=1:1
-    [N_hat{idx}, WA_hat{idx}, Wb_hat{idx}] = feval(N_Estimator, x{idx}, u{idx});
+    [N_hat{idx}, H_cell{idx}, W_hat{idx}] = feval(N_Estimator, x{idx}, u{idx});
 end
 error('stop here');
 %--------------------------------------------------------------------------
