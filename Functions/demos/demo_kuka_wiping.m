@@ -89,7 +89,7 @@ end
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 fprintf(1,'Estimating constraints ...\n');
-N_Estimator = getClosedFormNullSpaceProjectionMatrixEstimatior(Phi_A, Phi_b, 3);
+N_Estimator = def_constraint_estimator(Phi_A, Phi_b, 3);
 N_hat = cell(1,NDem);
 WA_hat = cell(1,NDem);
 Wb_hat = cell(1,NDem);

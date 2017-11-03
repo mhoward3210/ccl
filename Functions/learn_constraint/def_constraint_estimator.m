@@ -1,4 +1,4 @@
-function functionHandle = getClosedFormNullSpaceProjectionMatrixEstimatior(Phi_A, Phi_b, ConstraintDim)
+function functionHandle = def_constraint_estimator(Phi_A, Phi_b, ConstraintDim)
     functionHandle = @ClosedFormNullSpaceProjectionMatrixEstimatior;
 
     function [nullSpaceProjectionHat, WA_hat, Wb_hat] = ClosedFormNullSpaceProjectionMatrixEstimatior(q, u)
