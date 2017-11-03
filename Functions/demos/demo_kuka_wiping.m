@@ -62,7 +62,24 @@ Phi_b = def_phib_4_spm_exp(robot); % Phi_b(x): vector of regressors for the main
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 fprintf(1,'Initializing parallel pool ...\n');
-gcp(); % Get the current parallel pool
+%gcp(); % Get the current parallel pool
+%--------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+
+%% Estimate the null space projection matrix for each demonstration
+%--------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+fprintf(1,'Estimating constraints ...\n');
+N_Estimator = def_constraint_estimator(Phi_A, Phi_b,...
+                        'system_type','forced_action',...
+                        'constraint_dim',3);
+N_hat = cell(1,NDem);
+WA_hat = cell(1,NDem);
+Wb_hat = cell(1,NDem);
+for idx=1:1
+    [N_hat{idx}, WA_hat{idx}, Wb_hat{idx}] = feval(N_Estimator, x{idx}, u{idx});
+end
+error('stop here');
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 
@@ -81,20 +98,6 @@ parfor idx=1:NDem
     p{idx} = getPos(cell2mat(x{idx}).'); % compute end-effector postion
     [c{idx}, r{idx}, n{idx}] = fit_3d_circle(p{idx}(:,1),p{idx}(:,2),p{idx}(:,3));
     Phi{idx} = def_phi_4_cwm(robot, c{idx}, r{idx}); % Get regressors for the unconstrained policy
-end
-%--------------------------------------------------------------------------
-%--------------------------------------------------------------------------
-
-%% Estimate the null space projection matrix for each demonstration
-%--------------------------------------------------------------------------
-%--------------------------------------------------------------------------
-fprintf(1,'Estimating constraints ...\n');
-N_Estimator = def_constraint_estimator(Phi_A, Phi_b, 3);
-N_hat = cell(1,NDem);
-WA_hat = cell(1,NDem);
-Wb_hat = cell(1,NDem);
-parfor idx=1:NDem
-    [N_hat{idx}, WA_hat{idx}, Wb_hat{idx}] = feval(N_Estimator, x{idx}, u{idx});
 end
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------

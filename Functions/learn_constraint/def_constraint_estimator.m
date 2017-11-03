@@ -1,10 +1,26 @@
-function functionHandle = def_constraint_estimator(Phi_A, Phi_b, ConstraintDim)
+function functionHandle = def_constraint_estimator(Phi_A, Phi_b, varargin)
     functionHandle = @ClosedFormNullSpaceProjectionMatrixEstimatior;
+    
+    validIntNum = @(x) isnumeric(x) && isscalar(x) && (x > 0) && rem(x,1)==0;
+    
+    defaultConstraintDim = 1;
+    defaultSystemType = 'forced_action';
+    expectedSystemTypes = {'forced_action','stationary'};
+
+    p = inputParser;
+    p.CaseSensitive = true;
+    p.FunctionName = 'def_constraint_estimator';
+    addParameter(p, 'system_type', defaultSystemType,...
+        @(x) any(validatestring(x,expectedSystemTypes)));
+    addParameter(p, 'constraint_dim', defaultConstraintDim, validIntNum);
+    parse(p,varargin{:});
+    
+    ConstraintDim = p.Results.constraint_dim;
+    %SystemType = p.Results.system_type;
 
     function [nullSpaceProjectionHat, WA_hat, Wb_hat] = ClosedFormNullSpaceProjectionMatrixEstimatior(q, u)
-        % number of the regressors of the constraint function
-        Ndof = length(q{1});
-        NA = size(Phi_A(zeros(Ndof,1)),1);
+        % number of the regressors for the constraint matrix
+        NA = size(Phi_A(q{1}),1);
         % Evaluate constraint and task regressors for all the data
         H = @(q,u) [Phi_A(q)*u; -Phi_b(q)];
         H_cell = cellfun(H, q, u, 'UniformOutput', false);
