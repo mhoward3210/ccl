@@ -1,4 +1,4 @@
-function functionHandle = def_constraint_estimator(Phi_A, Phi_b, varargin)
+function functionHandle = def_constraint_estimator(Phi_A, varargin)
     functionHandle = @ClosedFormNullSpaceProjectionMatrixEstimatior;
     
     % Default parameters:
@@ -6,25 +6,38 @@ function functionHandle = def_constraint_estimator(Phi_A, Phi_b, varargin)
     defaultSystemType = 'forced_action';
     % List of expected types of constrained systems and respective vector H:
     expectedSystemTypes = {'forced_action','stationary'};
-    expectedH = {@(q,u) [Phi_A(q)*u; -Phi_b(q)], @(q,u) Phi_A(q)*u};
+    
     % Auxiliar functions:
     % Test if argument is a numeric, scaler, positive, and integer:
     validIntNum = @(x) isnumeric(x) && isscalar(x) && (x > 0) && rem(x,1)==0;
+    validFunc = @(f) isa(f, 'function_handle');
     % Define an input arguments parser:
     p = inputParser;
     p.CaseSensitive = true;
     p.FunctionName = 'def_constraint_estimator';
+    % Add required variables:
+    addRequired(p,'Phi_A',validFunc);
     % Add parameters to parser:
     addParameter(p, 'system_type', defaultSystemType,...
         @(x) any(validatestring(x,expectedSystemTypes)));
     addParameter(p, 'constraint_dim', defaultConstraintDim, validIntNum);
+    addParameter(p, 'task_regressors', [], validFunc);
     % Parse function inputs:
-    parse(p,varargin{:});
-    % Get the constraint dimension and type of constrained system from
-    % parser:
+    parse(p,Phi_A,varargin{:});
+    % Get the constraint dimension, type of constrained system, and first
+    % task regressors from parser:
     ConstraintDim = p.Results.constraint_dim;
     systemType = p.Results.system_type;
-    H = expectedH{strcmp(systemType,expectedSystemTypes)};
+    if strcmp(systemType, 'stationary')
+        H = @(q,u) Phi_A(q)*u;
+    elseif strcmp(systemType, 'forced_action')
+        if validFunc(p.Results.task_regressors)
+            Phi_b = p.Results.task_regressors;
+            H = @(q,u) [Phi_A(q)*u; -Phi_b(q)];
+        else
+            error('def_constraint_estimator: ''task_regressors'' parameter not defined');
+        end
+    end
     % Returned function:
     function [nullSpaceProjectionHat, H_cell, W_hat] = ClosedFormNullSpaceProjectionMatrixEstimatior(q, u)
         % Evaluate H regressors for the given data set
