@@ -62,8 +62,21 @@ N_Estimator = def_constraint_estimator(Phi_A,...
 N_hat = cell(1, NDem);
 H_cell = cell(1, NDem);
 W_hat = cell(1, NDem);
+%--------------------------------------------------------------------------
+% Set KCL settings for learning null space projection matrix:
+%--------------------------------------------------------------------------
+model_lambda_ccl = cell(1, NDem);
+settings.dim_x = 7; % dimensionality of the state space
+settings.dim_u = 7;% dimensionality of the action space
+settings.dim_r = 3; % dimensionality of the task space
+settings.dim_b = 10; % dimensionality of the kernal
+%--------------------------------------------------------------------------
 for idx=1:1
     [N_hat{idx}, H_cell{idx}, W_hat{idx}] = N_Estimator(x{idx}, u{idx});
+    NStr = cell2mat(u{idx}); % actions as matrix 7xN
+    Xtr = cell2mat(x{idx}); % state as matrix 7xN
+    J = Phi_A; % Regressors for constraint matrix: A = lambda * J;
+    model_lambda_ccl{idx}  = learn_lambda_ccl (NStr, Xtr, J, settings);
 end
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
