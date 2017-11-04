@@ -21,7 +21,8 @@ function functionHandle = def_constraint_estimator(Phi_A, varargin)
 % This regressors are a function of the robot configuration - column vector.
 % 
 % def_constraint_estimator returns a MatLab function handle to an estimator function.
-% This estimator gets as input a set of states (stored in a cell) and a set of actions (stored in a cell) and returns the null space projection matrix function for the data set constraint.
+% This estimator gets as input a set of states (stored in a cell) and a set of actions (stored in a cell)
+% and returns the null space projection matrix function for the data set constraint.
 %
 % This closed form null space projection estimator works by constructing the following system:
 %
@@ -33,6 +34,11 @@ function functionHandle = def_constraint_estimator(Phi_A, varargin)
 %         Hi(x,u) = Phi_A(x)*u, for stationary system, and
 %
 %         Hi(x,u) = [Phi_A(x)*u; -Phi_b(x)], for forced action systems.
+%
+% For details please refer to:
+%   Leopoldo Armesto, João Moura, Vladimir Ivan, Antonio Salas, and Sethu Vijayakumar.
+%   Learning Constrained Generaliz- able Policies by Demonstration.
+%   In Proceedings of Robotics: Science and System XIII, 7 2017.
 %
 % Syntax:  
 %     functionHandle = def_constraint_estimator(Phi_A)
@@ -47,10 +53,11 @@ function functionHandle = def_constraint_estimator(Phi_A, varargin)
 %     Phi_A - MatLab function handle to constraint Matrix regressors;
 %
 % Outputs:
-%     functionHandle - MatLab function handle with cell data set of states and a cell data set of %                       actions as inputs. This function handle is a null space projection matrix
-%                       estimator, whose output is a MatLab function handle to a null space 
-%                       projection matrix estimate function, the matrix H used to do the 
-%                       estimate, and the estimated weights W.
+%     functionHandle - MatLab function handle with cell data set of states and a cell data set of
+%                      actions as inputs. This function handle is a null space projection matrix
+%                      estimator, whose output is a MatLab function handle to a null space 
+%                      projection matrix estimate function, the matrix H used to do the 
+%                      estimate, and the estimated weights W.
 %
 % Example: 
 %     % Robot Kinematic model specified by the Denavit-Hartenberg:
