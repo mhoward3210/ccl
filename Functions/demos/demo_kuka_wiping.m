@@ -62,7 +62,7 @@ Phi_b = def_phib_4_spm_exp(robot); % Phi_b(x): vector of regressors for the main
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 fprintf(1,'Initializing parallel pool ...\n');
-%gcp(); % Get the current parallel pool
+gcp(); % Get the current parallel pool
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 
@@ -72,15 +72,14 @@ fprintf(1,'Initializing parallel pool ...\n');
 fprintf(1,'Estimating constraints ...\n');
 N_Estimator = def_constraint_estimator(Phi_A,...
                         'system_type','forced_action',...
-                        'constraint_dim',3,...
-                        'task_regressors',Phi_b);
+                        'task_regressors',Phi_b,...
+                        'constraint_dim',3);
 N_hat = cell(1,NDem);
 H_cell = cell(1,NDem);
 W_hat = cell(1,NDem);
-for idx=1:1
+for idx=1:NDem
     [N_hat{idx}, H_cell{idx}, W_hat{idx}] = feval(N_Estimator, x{idx}, u{idx});
 end
-error('stop here');
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 
@@ -98,7 +97,7 @@ parfor idx=1:NDem
     %p{idx} = transl(robot.fkine(cell2mat(q{idx}).')); % compute end-effector postion
     p{idx} = getPos(cell2mat(x{idx}).'); % compute end-effector postion
     [c{idx}, r{idx}, n{idx}] = fit_3d_circle(p{idx}(:,1),p{idx}(:,2),p{idx}(:,3));
-    Phi{idx} = def_phi_4_cwm(robot, c{idx}, r{idx}); % Get regressors for the unconstrained policy
+    Phi{idx} = def_phi_4_cwm_sim(robot, c{idx}, r{idx}); % Get regressors for the unconstrained policy
 end
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
@@ -167,6 +166,7 @@ end
 fprintf(1,'Compute End-Effector positions...\n');
 Phi_b = def_phib_4_spm_sim(robot); % vector of regressors as a function of the configuration for the main task
 pos = cell(1, NDem); % wiping circle centre
+traj = cell(1, NDem); % joints trajectory
 parfor idx=1:NDem
     % Problem specific constants taken from data:
     x0 = x{idx}{1}; % initial configuration
@@ -180,9 +180,10 @@ parfor idx=1:NDem
     % Constrained Policie
     dx = def_constrained_policy(A, b, policy{idx});
     % solving motion
-    [~,traj] = ode113(@(t,x) dx(x),[0 t{idx}{end}], x0);
+    sol = ode113(@(t,x) dx(x),[0 t{idx}{end}], x0);
+    [traj{idx}, ~] = deval(sol,cell2mat(t{idx})); % evaluation of solution
     %pos=transl(robot.fkine(traj));
-    pos{idx}=getPos(traj);
+    pos{idx}=getPos(traj{idx}.');
 end
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
