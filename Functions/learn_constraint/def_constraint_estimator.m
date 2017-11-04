@@ -51,6 +51,9 @@ function functionHandle = def_constraint_estimator(Phi_A, varargin)
 %
 % Inputs:
 %     Phi_A - MatLab function handle to constraint Matrix regressors;
+%     'system_type', type - where type can be 'stationary' (default) or 'forced_action';
+%     'task_regressors', phi_b - where phi_b is a MatLab function handle to the task function of the system state;
+%     'constraint_dim', int_number - where int_number is an positive integer number indicating the number of constraints.
 %
 % Outputs:
 %     functionHandle - MatLab function handle with cell data set of states and a cell data set of
