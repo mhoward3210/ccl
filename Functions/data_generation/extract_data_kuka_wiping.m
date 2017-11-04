@@ -39,6 +39,6 @@ for i=1:NDem
     % cut initial samples
     x{i} = x{i}(N_cut:end);
     u{i} = u{i}(N_cut:end);
-    t{i} = t{i}(N_cut:end); 
+    t{i} = gsubtract(t{i}(N_cut:end),t{i}{N_cut});
 end
 save(data_file_name,'x','u','t');
