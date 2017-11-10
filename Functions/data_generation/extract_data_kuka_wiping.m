@@ -12,10 +12,10 @@
 
 %% User Input
 files_directory = '../../../Leo_code_test/joao_library/demonstrations_mat/';
-N_cut = 100; % initial N samples to be ignored due to initial adaptation to path
-data_file_name = 'data.mat';
-NDem = 12; % number of demonstrations to store (< number of files in dir)
-
+N_cut = 100; % Initial N samples to be ignored due to initial adaptation to path.
+data_file_name = 'data_smoth.mat';
+NDem = 12; % Number of demonstrations to store (< number of files in dir).
+K_mov_mean = 100; % Inteval for moving average to smoth the trainning data.
 
 %% Get data
 file_names = dir(strcat(files_directory,'2017*.mat')); % get data from real
@@ -30,8 +30,8 @@ t = cell(1, NDem); % store time
 for i=1:NDem
     file_name = file_names(i).name;
     fprintf(1,'Processing file %i: %s ...\n',i,file_name);
-    load(strcat(files_directory,file_name)); % get data from 1 demonstration
-    q_i = cell2mat(data_struct.jointPosition); % joint angles
+    load(strcat(files_directory,file_name)); % Get data from 1 demonstration.
+    q_i = movmean(cell2mat(data_struct.jointPosition),K_mov_mean); % Joint angles.
     dt_i = data_struct.dT(2:end);
     x{i} = num2cell(q_i(2:end,:).',1); % save state: joint angles
     u{i} = num2cell((diff(q_i)./dt_i).',1); % save input: joint velocities
@@ -39,6 +39,6 @@ for i=1:NDem
     % cut initial samples
     x{i} = x{i}(N_cut:end);
     u{i} = u{i}(N_cut:end);
-    t{i} = t{i}(N_cut:end); 
+    t{i} = gsubtract(t{i}(N_cut:end),t{i}{N_cut});
 end
 save(data_file_name,'x','u','t');
