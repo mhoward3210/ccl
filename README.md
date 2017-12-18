@@ -1,16 +1,4 @@
-# ccl
+The Constraint Consistent Learning (CCL) Library implements a family of data-driven methods that are capable of (i) learning state-independent and -dependent constraints, (ii) decomposing the behaviour of redundant systems into task- and null-space parts, and (iii) uncovering the underlying null space control policy.
 
-this is a test
-# This is an <h1> tag
-## This is an <h2> tag
-###### This is an <h6> tag
-*This text will be italic*
-_This will also be italic_
-
-**This text will be bold**
-__This will also be bold__
-
-_You **can** combine them_
-
-http://github.com - automatic!
-[GitHub](http://github.com)
+# Documentation
+Documentation for the Matlab implementation can be found [here](http://github.com/mhoward3210/ccl/doc)
