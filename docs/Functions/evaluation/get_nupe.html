@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of get_nupe</title>
+  <meta name="keywords" content="get_nupe">
+  <meta name="description" content="[nupe, v, mse] = get_nupe(F, Fp)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">evaluation</a> &gt; get_nupe.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions/evaluation&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>get_nupe
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[nupe, v, mse] = get_nupe(F, Fp)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [nupe, v, mse] = get_nupe(F, Fp) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [nupe, v, mse] = get_nupe(F, Fp)
+
+ Calculate normalised unconstrained policy error (nUPE).  This quantity is
+ used to evaluate the unconstrained learnt null space policy
+
+ Input:                        
+
+   F                           True null space control commands
+   Fp                          Learnt null space control commands
+
+ Output:
+   nupe                        Normalised unconstrained policy error (nUPE)
+   v                           Variance
+   mse                         Mean square error</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="get_nmse.html" class="code" title="function [nmse v mse] = get_nmse(Y,Yp)">get_nmse</a>	[nmse v mse] = get_nmse(Y,Yp)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../Functions/demos/demo_2_link_arm.html" class="code" title="function demo_2_link_arm">demo_2_link_arm</a>	demo_2_link_arm</li><li><a href="../../Functions/demos/demo_toy_example_2D.html" class="code" title="function demo_toy_example_2D">demo_toy_example_2D</a>	demo_toy_example_2D</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [nupe, v, mse] = get_nupe(F, Fp)</a>
+0002 <span class="comment">% [nupe, v, mse] = get_nupe(F, Fp)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Calculate normalised unconstrained policy error (nUPE).  This quantity is</span>
+0005 <span class="comment">% used to evaluate the unconstrained learnt null space policy</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Input:</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%   F                           True null space control commands</span>
+0010 <span class="comment">%   Fp                          Learnt null space control commands</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Output:</span>
+0013 <span class="comment">%   nupe                        Normalised unconstrained policy error (nUPE)</span>
+0014 <span class="comment">%   v                           Variance</span>
+0015 <span class="comment">%   mse                         Mean square error</span>
+0016 
+0017 <span class="comment">% CCL: A MATLAB library for Constraint Consistent Learning</span>
+0018 <span class="comment">% Copyright (C) 2007  Matthew Howard</span>
+0019 <span class="comment">% Contact: matthew.j.howard@kcl.ac.uk</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% This library is free software; you can redistribute it and/or</span>
+0022 <span class="comment">% modify it under the terms of the GNU Lesser General Public</span>
+0023 <span class="comment">% License as published by the Free Software Foundation; either</span>
+0024 <span class="comment">% version 2.1 of the License, or (at your option) any later version.</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">% This library is distributed in the hope that it will be useful,</span>
+0027 <span class="comment">% but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+0028 <span class="comment">% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+0029 <span class="comment">% Lesser General Public License for more details.</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">% You should have received a copy of the GNU Library General Public</span>
+0032 <span class="comment">% License along with this library; if not, write to the Free</span>
+0033 <span class="comment">% Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.</span>
+0034 
+0035 [d v mse] = <a href="get_nmse.html" class="code" title="function [nmse v mse] = get_nmse(Y,Yp)">get_nmse</a>(F,Fp);
+0036 nupe = sum(mse)/sum(v);
+0037</pre></div>
+<hr><address>Generated on Mon 30-Oct-2017 17:46:26 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

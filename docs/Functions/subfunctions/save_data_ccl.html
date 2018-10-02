@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of save_data_ccl</title>
+  <meta name="keywords" content="save_data_ccl">
+  <meta name="description" content="save_data_ccl(filename,D)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">subfunctions</a> &gt; save_data_ccl.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions/subfunctions&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>save_data_ccl
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>save_data_ccl(filename,D)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function save_data_ccl(filename,D) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> save_data_ccl(filename,D)
+
+ Function for saving data in human-readable format files for LSTD(0)-Q learning problems.
+
+ in: 
+    filename - filename
+    D        - data struct, containing
+     .T      - time
+     .X      - states
+     .U      - actions
+     .Y      - observed states
+     .Xn     - states after one time step
+     .Un     - actions after one time step (following policy)
+     .Yn     - observed states after one time step
+     .V      - value function at X 
+     .Q      - Q value function at X,U</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="read_save.html" class="code" title="function read_save(x,y,z,N,name)">read_save</a>	read_save(x,y,z,N,name)</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function save_data_ccl(filename,D)</a>
+0002 <span class="comment">% save_data_ccl(filename,D)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Function for saving data in human-readable format files for LSTD(0)-Q learning problems.</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% in:</span>
+0007 <span class="comment">%    filename - filename</span>
+0008 <span class="comment">%    D        - data struct, containing</span>
+0009 <span class="comment">%     .T      - time</span>
+0010 <span class="comment">%     .X      - states</span>
+0011 <span class="comment">%     .U      - actions</span>
+0012 <span class="comment">%     .Y      - observed states</span>
+0013 <span class="comment">%     .Xn     - states after one time step</span>
+0014 <span class="comment">%     .Un     - actions after one time step (following policy)</span>
+0015 <span class="comment">%     .Yn     - observed states after one time step</span>
+0016 <span class="comment">%     .V      - value function at X</span>
+0017 <span class="comment">%     .Q      - Q value function at X,U</span>
+0018 
+0019 
+0020 
+0021 
+0022 <span class="comment">% CCL: A MATLAB library for Constraint Consistent Learning</span>
+0023 <span class="comment">% Copyright (C) 2007  Matthew Howard</span>
+0024 <span class="comment">% Contact: matthew.j.howard@kcl.ac.uk</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">% This library is free software; you can redistribute it and/or</span>
+0027 <span class="comment">% modify it under the terms of the GNU Lesser General Public</span>
+0028 <span class="comment">% License as published by the Free Software Foundation; either</span>
+0029 <span class="comment">% version 2.1 of the License, or (at your option) any later version.</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">% This library is distributed in the hope that it will be useful,</span>
+0032 <span class="comment">% but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+0033 <span class="comment">% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+0034 <span class="comment">% Lesser General Public License for more details.</span>
+0035 <span class="comment">%</span>
+0036 <span class="comment">% You should have received a copy of the GNU Library General Public</span>
+0037 <span class="comment">% License along with this library; if not, write to the Free</span>
+0038 <span class="comment">% Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.</span>
+0039 
+0040 fid = fopen([filename,<span class="string">'.dat'</span>],<span class="string">'wt'</span>);
+0041 fprintf(fid,<span class="string">'N = %d\n'</span>,D.N);
+0042 fprintf(fid,<span class="string">'dimX = %d\n'</span>,size(D.X,1));
+0043 fprintf(fid,<span class="string">'dimY = %d\n'</span>,size(D.Y,1));
+0044 fprintf(fid,<span class="string">'dimA1= %d\n'</span>,size(D.A,1));
+0045 <span class="keyword">for</span> i=1:size(D.X,1),fprintf(fid,<span class="string">'X%d\t'</span> ,i);<span class="keyword">end</span>
+0046 <span class="keyword">for</span> i=1:size(D.Y,1),fprintf(fid,<span class="string">'Y%d\t'</span> ,i);<span class="keyword">end</span>
+0047 <span class="keyword">for</span> i=1:size(D.F,1),fprintf(fid,<span class="string">'F%d\t'</span>,i);<span class="keyword">end</span>
+0048 <span class="keyword">for</span> i=1:size(D.A,1),<span class="keyword">for</span> j=1:size(D.A,2),fprintf(fid,<span class="string">'A%d%d\t'</span>,i,j);<span class="keyword">end</span>;<span class="keyword">end</span>
+0049 <span class="keyword">for</span> i=1:size(D.P,1),<span class="keyword">for</span> j=1:size(D.P,2),fprintf(fid,<span class="string">'P%d%d\t'</span>,i,j);<span class="keyword">end</span>;<span class="keyword">end</span>
+0050 fprintf(fid,<span class="string">'\n'</span>);
+0051 fclose(fid);
+0052 dlmwrite([filename,<span class="string">'.dat'</span>],[D.X',D.Y',D.F',reshape(D.A,size(D.A,1)*size(D.A,2),size(D.A,3))',reshape(D.P,size(D.P,1)*size(D.P,2),size(D.P,3))'],<span class="string">'delimiter'</span>,<span class="string">'\t'</span>,<span class="string">'-append'</span>);
+0053</pre></div>
+<hr><address>Generated on Mon 30-Oct-2017 17:46:26 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of demo_kuka_wiping</title>
+  <meta name="keywords" content="demo_kuka_wiping">
+  <meta name="description" content="Given the data composed of states - joint positions - and actions - joint">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">demos</a> &gt; demo_kuka_wiping.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions/demos&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>demo_kuka_wiping
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Given the data composed of states - joint positions - and actions - joint</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Given the data composed of states - joint positions - and actions - joint
+ velocities, we estimate the null space projection matrix for each data 
+ set/demonstration and use that result to compute the unconstrained policy.
+ We then plot the result of the policy and estimated projection matrix with 
+ the input data for the kuka end-effector cartesian positions.
+
+ Other m-files required: 
+   def_phi_4_cwm.m
+   def_phib_4_spm_sim.m
+   def_phib_4_spm_exp.m
+   def_phia_4_spm.m
+   def_constrained_policy.m</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../Functions/learn_constraint/getClosedFormNullSpaceProjectionMatrixEstimatior.html" class="code" title="function [nullSpaceProjectionHat, WA_hat, Wb_hat] = ClosedFormNullSpaceProjectionMatrixEstimatior(q, u)">getClosedFormNullSpaceProjectionMatrixEstimatior</a>	number of the regressors of the constraint function</li><li><a href="../../Functions/regressors/def_phi_4_cwm.html" class="code" title="function functionHandle = def_phi_4_cwm(robotHandle, c_G, radius)">def_phi_4_cwm</a>	Defines a set of regressors for a unconstrained policy for a circular wiping motion.</li><li><a href="../../Functions/regressors/def_phia_4_spm.html" class="code" title="function functionHandle = def_phia_4_spm(robotHandle)">def_phia_4_spm</a>	Defines suitable regressors for the constraint matrix for a surface perpendicular motion.</li><li><a href="../../Functions/regressors/def_phib_4_spm_exp.html" class="code" title="function functionHandle = def_phib_4_spm_exp(robotHandle)">def_phib_4_spm_exp</a>	Defines a set of regressors for the task of maintaining the constraint of a surface perpendicular motion.</li><li><a href="../../Functions/regressors/def_phib_4_spm_sim.html" class="code" title="function functionHandle = def_phib_4_spm_sim(robotHandle)">def_phib_4_spm_sim</a>	Defines a set of regressors for the task of maintaining the constraint of a surface perpendicular motion.</li><li><a href="../../Functions/subfunctions/compute_matrix_r.html" class="code" title="function R = compute_matrix_r(N_hat, Phi, q)">compute_matrix_r</a>	</li><li><a href="../../Functions/subfunctions/def_constrained_policy.html" class="code" title="function functionHandle = def_constrained_policy(constraintMatrix, task, unconstrainedPolicy)">def_constrained_policy</a>	Defines a constrained policy given the unconstrained policy and the constraint.</li><li><a href="../../Functions/subfunctions/def_weighted_linear_model.html" class="code" title="functionHandle = @weightedLinearModelPolicy;">def_weighted_linear_model</a>	Model variables:</li><li><a href="../../Functions/subfunctions/fit_3d_circle.html" class="code" title="function [centre, radius, normal] = fit_3d_circle(x,y,z)">fit_3d_circle</a>	</li><li><a href="../../Functions/subfunctions/plotCircle3D.html" class="code" title="function plotCircle3D(center,radius,normal)">plotCircle3D</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Given the data composed of states - joint positions - and actions - joint</span>
+0002 <span class="comment">% velocities, we estimate the null space projection matrix for each data</span>
+0003 <span class="comment">% set/demonstration and use that result to compute the unconstrained policy.</span>
+0004 <span class="comment">% We then plot the result of the policy and estimated projection matrix with</span>
+0005 <span class="comment">% the input data for the kuka end-effector cartesian positions.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Other m-files required:</span>
+0008 <span class="comment">%   def_phi_4_cwm.m</span>
+0009 <span class="comment">%   def_phib_4_spm_sim.m</span>
+0010 <span class="comment">%   def_phib_4_spm_exp.m</span>
+0011 <span class="comment">%   def_phia_4_spm.m</span>
+0012 <span class="comment">%   def_constrained_policy.m</span>
+0013 
+0014 <span class="comment">% Author: Joao Moura</span>
+0015 <span class="comment">% Edinburgh Centre for Robotics, Edinburgh, UK</span>
+0016 <span class="comment">% email address: Joao.Moura@ed.ac.uk</span>
+0017 <span class="comment">% Website: http://www.edinburgh-robotics.org/students/joao-moura</span>
+0018 <span class="comment">% October 2017; Last revision: 23-Oct-2017</span>
+0019 
+0020 <span class="comment">%% User Input</span>
+0021 <span class="comment">%--------------------------------------------------------------------------</span>
+0022 <span class="comment">%--------------------------------------------------------------------------</span>
+0023 DH = [0.0, 0.31, 0.0, pi/2; <span class="comment">% Robot Kinematic model specified by the Denavit-Hartnbergh</span>
+0024       0.0, 0.0, 0.0, -pi/2;
+0025       0.0, 0.4, 0.0, -pi/2;
+0026       0.0, 0.0, 0.0, pi/2;
+0027       0.0, 0.39, 0.0, pi/2;
+0028       0.0, 0.0, 0.0, -pi/2;
+0029       0.0, 0.21-0.132, 0.0, 0.0];
+0030 <span class="comment">%--------------------------------------------------------------------------</span>
+0031 <span class="comment">%--------------------------------------------------------------------------</span>
+0032 
+0033 <span class="comment">%% Add path</span>
+0034 <span class="comment">%--------------------------------------------------------------------------</span>
+0035 <span class="comment">%--------------------------------------------------------------------------</span>
+0036 addpath(genpath(<span class="string">'../'</span>)); <span class="comment">% add the library and it's subfolders to the path</span>
+0037 <span class="comment">%--------------------------------------------------------------------------</span>
+0038 <span class="comment">%--------------------------------------------------------------------------</span>
+0039 
+0040 <span class="comment">%% Get data</span>
+0041 <span class="comment">%--------------------------------------------------------------------------</span>
+0042 <span class="comment">%--------------------------------------------------------------------------</span>
+0043 fprintf(1,<span class="string">'Getting data ...\n'</span>);
+0044 <span class="comment">%load('../data_generation/data_simulated.mat');</span>
+0045 load(<span class="string">'data.mat'</span>);
+0046 <span class="comment">%load('demonstrations_mat/data.mat');</span>
+0047 NDem = length(x); <span class="comment">% number of demonstrations</span>
+0048 <span class="comment">%--------------------------------------------------------------------------</span>
+0049 <span class="comment">%--------------------------------------------------------------------------</span>
+0050 
+0051 <span class="comment">%% Initialize roobot model and the Regressors for the constraint and main task</span>
+0052 <span class="comment">%--------------------------------------------------------------------------</span>
+0053 <span class="comment">%--------------------------------------------------------------------------</span>
+0054 fprintf(1,<span class="string">'Defining robot model ...\n'</span>);
+0055 robot = SerialLink(DH); <span class="comment">% Peters Cork robotics library has to be installed</span>
+0056 Phi_A = <a href="../../Functions/regressors/def_phia_4_spm.html" class="code" title="function functionHandle = def_phia_4_spm(robotHandle)">def_phia_4_spm</a>(robot); <span class="comment">% Phi_A(x): vector of regressors for the Constraint matrix as a function of the configuration</span>
+0057 Phi_b = <a href="../../Functions/regressors/def_phib_4_spm_exp.html" class="code" title="function functionHandle = def_phib_4_spm_exp(robotHandle)">def_phib_4_spm_exp</a>(robot); <span class="comment">% Phi_b(x): vector of regressors for the main task as a function of the configuration</span>
+0058 <span class="comment">%--------------------------------------------------------------------------</span>
+0059 <span class="comment">%--------------------------------------------------------------------------</span>
+0060 
+0061 <span class="comment">%% Parallel computig settingsfeval(</span>
+0062 <span class="comment">%--------------------------------------------------------------------------</span>
+0063 <span class="comment">%--------------------------------------------------------------------------</span>
+0064 fprintf(1,<span class="string">'Initializing parallel pool ...\n'</span>);
+0065 gcp(); <span class="comment">% Get the current parallel pool</span>
+0066 <span class="comment">%--------------------------------------------------------------------------</span>
+0067 <span class="comment">%--------------------------------------------------------------------------</span>
+0068 
+0069 <span class="comment">%% Define Policy Regressors for each demonstration</span>
+0070 <span class="comment">%--------------------------------------------------------------------------</span>
+0071 <span class="comment">%--------------------------------------------------------------------------</span>
+0072 fprintf(1,<span class="string">'Defining Unconstrained Policy Regressors ...\n'</span>);
+0073 c = cell(1, NDem); <span class="comment">% wiping circle centre</span>
+0074 r = cell(1, NDem); <span class="comment">% wiping circle radious</span>
+0075 n = cell(1, NDem); <span class="comment">% planar surface normal</span>
+0076 p = cell(1, NDem); <span class="comment">% end-effector cartesian position in global frame</span>
+0077 Phi = cell(1,NDem);
+0078 getPos = @(q) transl(robot.fkine(q)); <span class="comment">% compute end-effector postion</span>
+0079 parfor idx=1:NDem
+0080     <span class="comment">%p{idx} = transl(robot.fkine(cell2mat(q{idx}).')); % compute end-effector postion</span>
+0081     p{idx} = getPos(cell2mat(x{idx}).'); <span class="comment">% compute end-effector postion</span>
+0082     [c{idx}, r{idx}, n{idx}] = <a href="../../Functions/subfunctions/fit_3d_circle.html" class="code" title="function [centre, radius, normal] = fit_3d_circle(x,y,z)">fit_3d_circle</a>(p{idx}(:,1),p{idx}(:,2),p{idx}(:,3));
+0083     Phi{idx} = <a href="../../Functions/regressors/def_phi_4_cwm.html" class="code" title="function functionHandle = def_phi_4_cwm(robotHandle, c_G, radius)">def_phi_4_cwm</a>(robot, c{idx}, r{idx}); <span class="comment">% Get regressors for the unconstrained policy</span>
+0084 <span class="keyword">end</span>
+0085 <span class="comment">%--------------------------------------------------------------------------</span>
+0086 <span class="comment">%--------------------------------------------------------------------------</span>
+0087 
+0088 <span class="comment">%% Estimate the null space projection matrix for each demonstration</span>
+0089 <span class="comment">%--------------------------------------------------------------------------</span>
+0090 <span class="comment">%--------------------------------------------------------------------------</span>
+0091 fprintf(1,<span class="string">'Estimating constraints ...\n'</span>);
+0092 N_Estimator = <a href="../../Functions/learn_constraint/getClosedFormNullSpaceProjectionMatrixEstimatior.html" class="code" title="function [nullSpaceProjectionHat, WA_hat, Wb_hat] = ClosedFormNullSpaceProjectionMatrixEstimatior(q, u)">getClosedFormNullSpaceProjectionMatrixEstimatior</a>(Phi_A, Phi_b, 3);
+0093 N_hat = cell(1,NDem);
+0094 WA_hat = cell(1,NDem);
+0095 Wb_hat = cell(1,NDem);
+0096 parfor idx=1:NDem
+0097     [N_hat{idx}, WA_hat{idx}, Wb_hat{idx}] = feval(N_Estimator, x{idx}, u{idx});
+0098 <span class="keyword">end</span>
+0099 <span class="comment">%--------------------------------------------------------------------------</span>
+0100 <span class="comment">%--------------------------------------------------------------------------</span>
+0101 
+0102 <span class="comment">%% Compute model variance</span>
+0103 <span class="comment">%--------------------------------------------------------------------------</span>
+0104 <span class="comment">%--------------------------------------------------------------------------</span>
+0105 fprintf(1,<span class="string">'Computing data variance...\n'</span>);
+0106 xall = cell2mat([x{:}]).';
+0107 scale = 2;
+0108 model.var = scale.*std(xall,1,1).';
+0109 <span class="comment">%--------------------------------------------------------------------------</span>
+0110 <span class="comment">%--------------------------------------------------------------------------</span>
+0111 
+0112 <span class="comment">%% Compute model local Gaussian receptive fields centres'</span>
+0113 <span class="comment">%--------------------------------------------------------------------------</span>
+0114 <span class="comment">%--------------------------------------------------------------------------</span>
+0115 fprintf(1,<span class="string">'Computing Receptive Fields Centres ...\n'</span>);
+0116 stream = RandStream(<span class="string">'mlfg6331_64'</span>);  <span class="comment">% Random number stream for parallel computation</span>
+0117 options = statset(<span class="string">'Display'</span>,<span class="string">'off'</span>,<span class="string">'MaxIter'</span>,200,<span class="string">'UseParallel'</span>,1,<span class="string">'UseSubstreams'</span>,1,<span class="string">'Streams'</span>,stream);
+0118 Nmodels = 25;
+0119 [~,C] = kmeans(xall,Nmodels,<span class="string">'Distance'</span>,<span class="string">'cityblock'</span>,<span class="string">'EmptyAction'</span>,<span class="string">'singleton'</span>,<span class="string">'Start'</span>,<span class="string">'uniform'</span>,<span class="keyword">...</span>
+0120     <span class="string">'Replicates'</span>,10,<span class="string">'OnlinePhase'</span>,<span class="string">'off'</span>,<span class="string">'Options'</span>, options);
+0121 model.c = C.';
+0122 <span class="comment">%--------------------------------------------------------------------------</span>
+0123 <span class="comment">%--------------------------------------------------------------------------</span>
+0124 
+0125 <span class="comment">%% Compute model parameters</span>
+0126 <span class="comment">%--------------------------------------------------------------------------</span>
+0127 <span class="comment">%--------------------------------------------------------------------------</span>
+0128 fprintf(1,<span class="string">'Learning Model Parameters...\n'</span>);
+0129 R_cell = cell(1,NDem);
+0130 parfor idx=1:NDem
+0131     R_cell{idx} = <a href="../../Functions/subfunctions/compute_matrix_r.html" class="code" title="function R = compute_matrix_r(N_hat, Phi, q)">compute_matrix_r</a>(N_hat{idx}, Phi{idx}, x{idx});
+0132 <span class="keyword">end</span>
+0133 R = cell2mat([R_cell{:}].');
+0134 Y = cell2mat([u{:}].');
+0135 B = zeros(size(Phi{1}(x{1}{1}),2),size(model.c,2));
+0136 w = @(m) @(x) exp(-0.5.*sum(bsxfun(@rdivide, bsxfun(@minus,x,model.c(:,m)).^2, model.var))).'; <span class="comment">% importance weights W = [w1 w2 ... w_m ... w_M]</span>
+0137 [nRrow,nRcol] = size(R_cell{1}{1});
+0138 parfor m=1:size(model.c,2)
+0139     wm = feval(w, m);
+0140     Wm = repelem(wm(xall.'),nRrow,nRcol);
+0141     RWm = R.*Wm;
+0142     B(:,m) = pinv(RWm.'*R)*RWm.'*Y;
+0143 <span class="keyword">end</span>
+0144 model.b = B;
+0145 <span class="comment">%--------------------------------------------------------------------------</span>
+0146 <span class="comment">%--------------------------------------------------------------------------</span>
+0147 
+0148 <span class="comment">%% Defining Unconstrained Policies</span>
+0149 <span class="comment">%--------------------------------------------------------------------------</span>
+0150 <span class="comment">%--------------------------------------------------------------------------</span>
+0151 fprintf(1,<span class="string">'Computing Unconstrained Policy...\n'</span>);
+0152 policy = cell(1,NDem);
+0153 parfor idx=1:NDem
+0154     policy{idx} = <a href="../../Functions/subfunctions/def_weighted_linear_model.html" class="code" title="functionHandle = @weightedLinearModelPolicy;">def_weighted_linear_model</a>(model, Phi{idx});
+0155 <span class="keyword">end</span>
+0156 <span class="comment">%--------------------------------------------------------------------------</span>
+0157 <span class="comment">%--------------------------------------------------------------------------</span>
+0158 
+0159 
+0160 <span class="comment">%% Computing end-effector positions based on learned policies</span>
+0161 <span class="comment">%--------------------------------------------------------------------------</span>
+0162 <span class="comment">%--------------------------------------------------------------------------</span>
+0163 fprintf(1,<span class="string">'Compute End-Effector positions...\n'</span>);
+0164 Phi_b = <a href="../../Functions/regressors/def_phib_4_spm_sim.html" class="code" title="function functionHandle = def_phib_4_spm_sim(robotHandle)">def_phib_4_spm_sim</a>(robot); <span class="comment">% vector of regressors as a function of the configuration for the main task</span>
+0165 pos = cell(1, NDem); <span class="comment">% wiping circle centre</span>
+0166 parfor idx=1:NDem
+0167     <span class="comment">% Problem specific constants taken from data:</span>
+0168     x0 = x{idx}{1}; <span class="comment">% initial configuration</span>
+0169     Kp = 5; <span class="comment">% proportional gain</span>
+0170     <span class="comment">% Constant matrices:</span>
+0171     W_A = blkdiag(n{idx}.', n{idx}.', n{idx}.'); <span class="comment">% constant gain matrix for the Constraint matrix</span>
+0172     W_b = -Kp*[W_A [-n{idx}.'*c{idx}; 0; 0]];
+0173     <span class="comment">% Definition of Constraint matrix and main task</span>
+0174     A = @(x) W_A*feval(Phi_A,x); <span class="comment">% Constraint matrix as a function of configuration</span>
+0175     b = @(x) W_b*feval(Phi_b,x); <span class="comment">% main task as a function of the configuration</span>
+0176     <span class="comment">% Constrained Policie</span>
+0177     dx = <a href="../../Functions/subfunctions/def_constrained_policy.html" class="code" title="function functionHandle = def_constrained_policy(constraintMatrix, task, unconstrainedPolicy)">def_constrained_policy</a>(A, b, policy{idx});
+0178     <span class="comment">% solving motion</span>
+0179     [~,traj] = ode113(@(t,x) dx(x),[0 t{idx}{end}], x0);
+0180     <span class="comment">%pos=transl(robot.fkine(traj));</span>
+0181     pos{idx}=getPos(traj);
+0182 <span class="keyword">end</span>
+0183 <span class="comment">%--------------------------------------------------------------------------</span>
+0184 <span class="comment">%--------------------------------------------------------------------------</span>
+0185 
+0186 <span class="comment">%% Plot end-effector positions</span>
+0187 <span class="comment">%--------------------------------------------------------------------------</span>
+0188 <span class="comment">%--------------------------------------------------------------------------</span>
+0189 fprintf(1,<span class="string">'Plotting Results...\n'</span>);
+0190 figure();
+0191 <span class="keyword">for</span> idx=1:NDem
+0192     <span class="comment">% plot</span>
+0193     subplot(3,4,idx);
+0194     plot3(c{idx}(1),c{idx}(2),c{idx}(3),<span class="string">'*r'</span>); hold on;
+0195     plot3(p{idx}(:,1),p{idx}(:,2),p{idx}(:,3),<span class="string">'g'</span>);
+0196     plot3(pos{idx}(:,1),pos{idx}(:,2),pos{idx}(:,3));
+0197     <a href="../../Functions/subfunctions/plotCircle3D.html" class="code" title="function plotCircle3D(center,radius,normal)">plotCircle3D</a>(c{idx},r{idx},n{idx});
+0198     xlabel(<span class="string">'x'</span>); ylabel(<span class="string">'y'</span>); zlabel(<span class="string">'z'</span>);
+0199     legend(<span class="string">'centre'</span>,<span class="string">'data'</span>,<span class="string">'policy'</span>,<span class="string">'circle'</span>);
+0200     axis equal;
+0201 <span class="keyword">end</span>
+0202 error(<span class="string">'stop here'</span>);
+0203 <span class="comment">%--------------------------------------------------------------------------</span>
+0204 <span class="comment">%--------------------------------------------------------------------------</span>
+0205 
+0206 <span class="comment">%% Auxiliar functions</span>
+0207 <span class="comment">%--------------------------------------------------------------------------</span>
+0208 <span class="comment">%--------------------------------------------------------------------------</span>
+0209 fprintf(1,<span class="string">'Deleting parallel pool...\n'</span>);
+0210 delete(gcp(<span class="string">'nocreate'</span>));
+0211 <span class="comment">%--------------------------------------------------------------------------</span>
+0212 <span class="comment">%--------------------------------------------------------------------------</span>
+0213 
+0214 <span class="comment">%% Remove path</span>
+0215 <span class="comment">%--------------------------------------------------------------------------</span>
+0216 <span class="comment">%--------------------------------------------------------------------------</span>
+0217 rmpath(genpath(<span class="string">'../'</span>));
+0218 <span class="comment">%--------------------------------------------------------------------------</span>
+0219 <span class="comment">%--------------------------------------------------------------------------</span></pre></div>
+<hr><address>Generated on Mon 30-Oct-2017 17:46:26 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>
