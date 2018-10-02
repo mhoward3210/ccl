@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of def_phi_4_cwm</title>
+  <meta name="keywords" content="def_phi_4_cwm">
+  <meta name="description" content="Defines a set of regressors for a unconstrained policy for a circular wiping motion.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">regressors</a> &gt; def_phi_4_cwm.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions/regressors&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>def_phi_4_cwm
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Defines a set of regressors for a unconstrained policy for a circular wiping motion.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function functionHandle = def_phi_4_cwm(robotHandle, c_G, radius) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Defines a set of regressors for a unconstrained policy for a circular wiping motion.
+
+ Consider the decomposition of the robot actions as a main task and
+ a secondary task in the null space of the main:
+
+       u(x) = pinv(A(x)) * b(x) + (I - pinv(A(x)) * A(x)) * u_pi(x),
+       
+ where x is the state (robot configuration), A(x) a Pfaffian constraint matrix,
+ and u_pi(x) is the unconstrained policy for the secondary task.
+ Consider we model u_pi(x) as a linear combination of a set of regressors that depend on the state x:
+
+       u_pi(x) = Phi(x) * bm;
+
+ where bm is a matrix of weights, and Phi(x) is a matrix of regressors.
+ def_phi_4_cwm returns a MatLab function handle to a set of regressors
+ suitable for the secondary task of circular motions with specified radius
+ and centre.
+ This regressors are a function of the robot configuration - column vector.
+
+ Syntax:  functionHandle = def_phi_4_cwm(robotHandle, c_G, radius)
+
+ Inputs:
+     robotHandle - Peter Corke's Serial-link robot class;
+     c_G - 3 dimensional column vector with Cartesian coordinates of the centre 
+             of the wiping motion relative to the robot global frame and in meters;
+     radius - radius of the wiping circle in meters.
+
+ Outputs:
+    functionHandle - MatLab function handle with robot configuration 
+                     (column vector) as input
+
+ Example: 
+     % Robot Kinematic model specified by the Denavit-Hartenberg:
+     DH = [0.0, 0.31, 0.0, pi/2;
+           0.0, 0.0, 0.0, -pi/2;
+           0.0, 0.4, 0.0, -pi/2;
+           0.0, 0.0, 0.0, pi/2;
+           0.0, 0.39, 0.0, pi/2;
+           0.0, 0.0, 0.0, -pi/2;
+           0.0, 0.21-0.132, 0.0, 0.0];
+     % Peters Cork robotics library has to be installed:
+     robot = SerialLink(DH);
+     % Defining unconstrained policy regressors:
+     centre = [0.1; 0.0; 0.4];
+     radius = 0.02;
+     Phi = def_phi_4_cwm(robot, centre, radius);
+     % Defining unconstrained policy:
+     u_pi = @(x) Phi(x)*[1 10];
+     % Constraint matrix for given robot arm configuration:
+     x = [0;0;0;pi/2;0;-pi/2;0];
+     disp(u_pi(x));
+
+ Libraries required: Peter Corke's Robotics library (MatLab add-on)
+ 
+ See also: <a href="def_phia_4_spm.html" class="code" title="function functionHandle = def_phia_4_spm(robotHandle)">def_phia_4_spm</a>, <a href="def_phib_4_spm_sim.html" class="code" title="function functionHandle = def_phib_4_spm_sim(robotHandle)">def_phib_4_spm_sim</a>, <a href="def_phia_4_spm.html" class="code" title="function functionHandle = def_phia_4_spm(robotHandle)">def_phia_4_spm</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../Functions/data_generation/test.html" class="code" title="">test</a>	Generates states (robot joint positions) and actions (robot joint velocities)</li><li><a href="../../Functions/demos/demo_kuka_wiping.html" class="code" title="">demo_kuka_wiping</a>	Given the data composed of states - joint positions - and actions - joint</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">functionHandle = @Phi;</a></li><li><a href="#_sub2" class="code">function output = Phi(q)</a></li><li><a href="#_sub3" class="code">function functionHandle = getPhi_kappa(robotHandle, c_G, radius)</a></li><li><a href="#_sub4" class="code">functionHandle = @Phi_kappa;</a></li><li><a href="#_sub5" class="code">function output = Phi_kappa(q)</a></li><li><a href="#_sub6" class="code">function functionHandle = getC_ro(robotHandle, c_G)</a></li><li><a href="#_sub7" class="code">functionHandle = @c_ro;</a></li><li><a href="#_sub8" class="code">function output = c_ro(q)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function functionHandle = def_phi_4_cwm(robotHandle, c_G, radius)</a>
+0002 <span class="comment">% Defines a set of regressors for a unconstrained policy for a circular wiping motion.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Consider the decomposition of the robot actions as a main task and</span>
+0005 <span class="comment">% a secondary task in the null space of the main:</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%       u(x) = pinv(A(x)) * b(x) + (I - pinv(A(x)) * A(x)) * u_pi(x),</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% where x is the state (robot configuration), A(x) a Pfaffian constraint matrix,</span>
+0010 <span class="comment">% and u_pi(x) is the unconstrained policy for the secondary task.</span>
+0011 <span class="comment">% Consider we model u_pi(x) as a linear combination of a set of regressors that depend on the state x:</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%       u_pi(x) = Phi(x) * bm;</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% where bm is a matrix of weights, and Phi(x) is a matrix of regressors.</span>
+0016 <span class="comment">% def_phi_4_cwm returns a MatLab function handle to a set of regressors</span>
+0017 <span class="comment">% suitable for the secondary task of circular motions with specified radius</span>
+0018 <span class="comment">% and centre.</span>
+0019 <span class="comment">% This regressors are a function of the robot configuration - column vector.</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% Syntax:  functionHandle = def_phi_4_cwm(robotHandle, c_G, radius)</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% Inputs:</span>
+0024 <span class="comment">%     robotHandle - Peter Corke's Serial-link robot class;</span>
+0025 <span class="comment">%     c_G - 3 dimensional column vector with Cartesian coordinates of the centre</span>
+0026 <span class="comment">%             of the wiping motion relative to the robot global frame and in meters;</span>
+0027 <span class="comment">%     radius - radius of the wiping circle in meters.</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% Outputs:</span>
+0030 <span class="comment">%    functionHandle - MatLab function handle with robot configuration</span>
+0031 <span class="comment">%                     (column vector) as input</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">% Example:</span>
+0034 <span class="comment">%     % Robot Kinematic model specified by the Denavit-Hartenberg:</span>
+0035 <span class="comment">%     DH = [0.0, 0.31, 0.0, pi/2;</span>
+0036 <span class="comment">%           0.0, 0.0, 0.0, -pi/2;</span>
+0037 <span class="comment">%           0.0, 0.4, 0.0, -pi/2;</span>
+0038 <span class="comment">%           0.0, 0.0, 0.0, pi/2;</span>
+0039 <span class="comment">%           0.0, 0.39, 0.0, pi/2;</span>
+0040 <span class="comment">%           0.0, 0.0, 0.0, -pi/2;</span>
+0041 <span class="comment">%           0.0, 0.21-0.132, 0.0, 0.0];</span>
+0042 <span class="comment">%     % Peters Cork robotics library has to be installed:</span>
+0043 <span class="comment">%     robot = SerialLink(DH);</span>
+0044 <span class="comment">%     % Defining unconstrained policy regressors:</span>
+0045 <span class="comment">%     centre = [0.1; 0.0; 0.4];</span>
+0046 <span class="comment">%     radius = 0.02;</span>
+0047 <span class="comment">%     Phi = def_phi_4_cwm(robot, centre, radius);</span>
+0048 <span class="comment">%     % Defining unconstrained policy:</span>
+0049 <span class="comment">%     u_pi = @(x) Phi(x)*[1 10];</span>
+0050 <span class="comment">%     % Constraint matrix for given robot arm configuration:</span>
+0051 <span class="comment">%     x = [0;0;0;pi/2;0;-pi/2;0];</span>
+0052 <span class="comment">%     disp(u_pi(x));</span>
+0053 <span class="comment">%</span>
+0054 <span class="comment">% Libraries required: Peter Corke's Robotics library (MatLab add-on)</span>
+0055 <span class="comment">%</span>
+0056 <span class="comment">% See also: def_phia_4_spm, def_phib_4_spm_sim, def_phia_4_spm</span>
+0057 
+0058 <span class="comment">% Author: Joao Moura</span>
+0059 <span class="comment">% Edinburgh Centre for Robotics, Edinburgh, UK</span>
+0060 <span class="comment">% email address: Joao.Moura@ed.ac.uk</span>
+0061 <span class="comment">% Website: http://www.edinburgh-robotics.org/students/joao-moura</span>
+0062 <span class="comment">% October 2017; Last revision: 25-Oct-2017</span>
+0063 
+0064 <span class="comment">%------------- BEGIN CODE --------------</span>
+0065 <a name="_sub1" href="#_subfunctions" class="code">functionHandle = @Phi;</a>
+0066 <a name="_sub2" href="#_subfunctions" class="code">function output = Phi(q)</a>
+0067     J = robotHandle.jacobe(q); <span class="comment">% Robot Jacobian in the end-effector frame.</span>
+0068     Jtask = J(1:2,:); <span class="comment">% Jacobian for the x and y coordinates - perpendicular plane to the end-effector.</span>
+0069     Jtask_inv = pinv(Jtask); <span class="comment">% Pseudo-inverse of the task Jacobian.</span>
+0070     N = eye(length(q)) - (Jtask_inv*Jtask); <span class="comment">% Compute null-space projection matrix for given configuration.</span>
+0071     <a href="#_sub5" class="code" title="subfunction output = Phi_kappa(q)">Phi_kappa</a> = <a href="#_sub3" class="code" title="subfunction functionHandle = getPhi_kappa(robotHandle, c_G, radius)">getPhi_kappa</a>(robotHandle, c_G, radius); <span class="comment">% Regressors for the secondary task.</span>
+0072     Phi_gamma = @(q) kron([q.' 1],eye(length(q))); <span class="comment">% Regressors for the third task.</span>
+0073     output = [Jtask_inv*<a href="#_sub5" class="code" title="subfunction output = Phi_kappa(q)">Phi_kappa</a>(q) N*Phi_gamma(q)];
+0074 <span class="keyword">end</span>
+0075 <a name="_sub3" href="#_subfunctions" class="code">function functionHandle = getPhi_kappa(robotHandle, c_G, radius)</a>
+0076     <a name="_sub4" href="#_subfunctions" class="code">functionHandle = @Phi_kappa;</a>
+0077     <a name="_sub5" href="#_subfunctions" class="code">function output = Phi_kappa(q)</a>
+0078         <a href="#_sub8" class="code" title="subfunction output = c_ro(q)">c_ro</a> = feval(<a href="#_sub6" class="code" title="subfunction functionHandle = getC_ro(robotHandle, c_G)">getC_ro</a>(robotHandle, c_G),q); <span class="comment">% centre of the circular motion to the end-effector relative to the end-effector frame</span>
+0079         c_ro_per = [0 -1; 1 0]*<a href="#_sub8" class="code" title="subfunction output = c_ro(q)">c_ro</a>; <span class="comment">% perpendicular to c_ro</span>
+0080         nc_ro = norm(<a href="#_sub8" class="code" title="subfunction output = c_ro(q)">c_ro</a>); <span class="comment">% total distance to the centre</span>
+0081         output = [c_ro_per <a href="#_sub8" class="code" title="subfunction output = c_ro(q)">c_ro</a>*(1-(radius/nc_ro))];
+0082     <span class="keyword">end</span>
+0083     <a name="_sub6" href="#_subfunctions" class="code">function functionHandle = getC_ro(robotHandle, c_G)</a>
+0084         <a name="_sub7" href="#_subfunctions" class="code">functionHandle = @c_ro;</a>
+0085         <a name="_sub8" href="#_subfunctions" class="code">function output = c_ro(q)</a>
+0086             T = robotHandle.fkine(q); <span class="comment">% end-effector homogeneous transformation</span>
+0087             tT = reshape(transl(T),[],1); <span class="comment">% end-effector position</span>
+0088             R = t2r(T); <span class="comment">% end-effector orientation (rotation matrix)</span>
+0089             centre = R.'*(c_G - tT); <span class="comment">% distance of the end-effector position and centre position rotated for end-effector frame</span>
+0090             output = centre(1:2);
+0091         <span class="keyword">end</span>
+0092     <span class="keyword">end</span>
+0093 <span class="keyword">end</span>
+0094 <span class="comment">%------------- END OF CODE --------------</span>
+0095 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 30-Oct-2017 17:46:26 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

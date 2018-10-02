@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of generate_data_kuka_wiping</title>
+  <meta name="keywords" content="generate_data_kuka_wiping">
+  <meta name="description" content="Generates states (robot joint positions) and actions (robot joint velocities)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">data_generation</a> &gt; generate_data_kuka_wiping.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions/data_generation&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>generate_data_kuka_wiping
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Generates states (robot joint positions) and actions (robot joint velocities)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Generates states (robot joint positions) and actions (robot joint velocities)
+ and time for a circular wiping motion as unconstrained policy and planar surface
+ constraints.
+   Saves the states and actions in file.
+
+ Other m-files required: 
+   def_phi_4_cwm_sim.m
+   def_phib_5_spm_sim.m
+   def_phia_4_spm.m
+   def_constrained_policy.m</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../Functions/regressors/def_phi_4_cwm_sim.html" class="code" title="function functionHandle = def_phi_4_cwm_sim(robotHandle, c_G, radius)">def_phi_4_cwm_sim</a>	Defines a set of regressors for a unconstrained policy for a circular wiping motion.</li><li><a href="../../Functions/regressors/def_phia_4_spm.html" class="code" title="function functionHandle = def_phia_4_spm(robotHandle)">def_phia_4_spm</a>	Defines suitable regressors for the constraint matrix for a surface perpendicular motion.</li><li><a href="../../Functions/regressors/def_phib_4_spm_sim.html" class="code" title="function functionHandle = def_phib_4_spm_sim(robotHandle)">def_phib_4_spm_sim</a>	Defines a set of regressors for the task of maintaining the constraint of a surface perpendicular motion.</li><li><a href="../../Functions/subfunctions/def_constrained_policy.html" class="code" title="function functionHandle = def_constrained_policy(constraintMatrix, task, unconstrainedPolicy)">def_constrained_policy</a>	Defines a constrained policy given the unconstrained policy and the constraint.</li><li><a href="../../Functions/subfunctions/plotCircle3D.html" class="code" title="function plotCircle3D(center,radius,normal)">plotCircle3D</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Generates states (robot joint positions) and actions (robot joint velocities)</span>
+0002 <span class="comment">% and time for a circular wiping motion as unconstrained policy and planar surface</span>
+0003 <span class="comment">% constraints.</span>
+0004 <span class="comment">%   Saves the states and actions in file.</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Other m-files required:</span>
+0007 <span class="comment">%   def_phi_4_cwm_sim.m</span>
+0008 <span class="comment">%   def_phib_5_spm_sim.m</span>
+0009 <span class="comment">%   def_phia_4_spm.m</span>
+0010 <span class="comment">%   def_constrained_policy.m</span>
+0011 
+0012 <span class="comment">% Author: Joao Moura</span>
+0013 <span class="comment">% Edinburgh Centre for Robotics, Edinburgh, UK</span>
+0014 <span class="comment">% email address: Joao.Moura@ed.ac.uk</span>
+0015 <span class="comment">% Website: http://www.edinburgh-robotics.org/students/joao-moura</span>
+0016 <span class="comment">% October 2017; Last revision: 18-Oct-2017</span>
+0017 
+0018 <span class="comment">%% User Input</span>
+0019 <span class="comment">%--------------------------------------------------------------------------</span>
+0020 <span class="comment">%--------------------------------------------------------------------------</span>
+0021 NDem = 12; <span class="comment">% number of demonstrations</span>
+0022 Dangle = 30; <span class="comment">% variation of angle in roll and pitch</span>
+0023 <span class="comment">% timming:</span>
+0024 tf = 30; <span class="comment">% duration of each simulation is seconds</span>
+0025 freq = 30; <span class="comment">% number of samples per second</span>
+0026 cutOffTime = 7; <span class="comment">% because the initial state of the simulation is not on the</span>
+0027 <span class="comment">% constraint, the simulation takes some time until the proportional</span>
+0028 <span class="comment">% controller converges the state to the constraint. This initial</span>
+0029 <span class="comment">% convergence time is cut out of the training data</span>
+0030 x0 = [0;0;0;pi/2;0;-pi/2;0]; <span class="comment">% initial condition</span>
+0031 Kp = 5; <span class="comment">% proportional gain</span>
+0032 <span class="comment">%--------------------------------------------------------------------------</span>
+0033 <span class="comment">%--------------------------------------------------------------------------</span>
+0034 
+0035 <span class="comment">%% Add path</span>
+0036 <span class="comment">%--------------------------------------------------------------------------</span>
+0037 <span class="comment">%--------------------------------------------------------------------------</span>
+0038 addpath(genpath(<span class="string">'../'</span>));
+0039 <span class="comment">%--------------------------------------------------------------------------</span>
+0040 <span class="comment">%--------------------------------------------------------------------------</span>
+0041 
+0042 <span class="comment">%% Initialize roobot model and the Regressors for the constraint and main task</span>
+0043 <span class="comment">%--------------------------------------------------------------------------</span>
+0044 <span class="comment">%--------------------------------------------------------------------------</span>
+0045 fprintf(1,<span class="string">'Defining robot model ...\n'</span>);
+0046 DH = [0.0, 0.31, 0.0, pi/2; <span class="comment">% Robot Kinematic model specified by the Denavit-Hartenberg</span>
+0047       0.0, 0.0, 0.0, -pi/2;
+0048       0.0, 0.4, 0.0, -pi/2;
+0049       0.0, 0.0, 0.0, pi/2;
+0050       0.0, 0.39, 0.0, pi/2;
+0051       0.0, 0.0, 0.0, -pi/2;
+0052       0.0, 0.21-0.132, 0.0, 0.0];
+0053 robot = SerialLink(DH); <span class="comment">% Peters Cork robotics library has to be installed</span>
+0054  <span class="comment">% Phi_A(x): vector of regressors for the Constraint matrix as a function</span>
+0055  <span class="comment">% of the state</span>
+0056 Phi_A = <a href="../../Functions/regressors/def_phia_4_spm.html" class="code" title="function functionHandle = def_phia_4_spm(robotHandle)">def_phia_4_spm</a>(robot);
+0057 <span class="comment">% Phi_b(x): vector of regressors for the main task as a function of the</span>
+0058 <span class="comment">% state</span>
+0059 Phi_b = <a href="../../Functions/regressors/def_phib_4_spm_sim.html" class="code" title="function functionHandle = def_phib_4_spm_sim(robotHandle)">def_phib_4_spm_sim</a>(robot);
+0060 <span class="comment">%--------------------------------------------------------------------------</span>
+0061 <span class="comment">%--------------------------------------------------------------------------</span>
+0062 
+0063 <span class="comment">%% Generate data</span>
+0064 <span class="comment">%--------------------------------------------------------------------------</span>
+0065 <span class="comment">%--------------------------------------------------------------------------</span>
+0066 fprintf(1,<span class="string">'Generating data ...\n'</span>);
+0067 x = cell(1, NDem); <span class="comment">% configurations</span>
+0068 u = cell(1, NDem); <span class="comment">% actions</span>
+0069 t = cell(1, NDem); <span class="comment">% configuration data</span>
+0070 p = cell(1, NDem); <span class="comment">% configurations</span>
+0071 c = cell(1, NDem); <span class="comment">% wiping circle centre</span>
+0072 r = cell(1, NDem); <span class="comment">% wiping circle radious</span>
+0073 n = cell(1, NDem); <span class="comment">% planar surface normal</span>
+0074 Phi = cell(1,NDem); <span class="comment">% policy regressors</span>
+0075 roll = cell(1,NDem);
+0076 pitch = cell(1,NDem);
+0077 unconstrainedPolicy = cell(1,NDem); <span class="comment">% unconstrainedPolicy</span>
+0078 time = linspace(0,tf,tf*freq); <span class="comment">% time vector</span>
+0079 timecond = time&gt;cutOffTime;
+0080 <span class="keyword">for</span> idx=1:NDem
+0081     <span class="comment">% Random variables:</span>
+0082     c{idx} = [rand().*0.15 + 0.45; rand().*0.1-0.05; rand().*0.15+0.35]; <span class="comment">% generate random circle centre</span>
+0083     r{idx} = rand()*0.02+0.03; <span class="comment">% generate random circle radious</span>
+0084     roll{idx} = rand()*(2*Dangle) - Dangle; 
+0085     pitch{idx} = rand()*(2*Dangle) - Dangle;
+0086     T = rpy2tr(roll{idx}, pitch{idx}, 0); <span class="comment">% homogeneous transformation for the end-effector</span>
+0087     n{idx} = T(1:3,3);
+0088     <span class="comment">% Constant matrices:</span>
+0089     W_A = blkdiag(n{idx}.', n{idx}.', n{idx}.'); <span class="comment">% constant gain matrix for the Constraint matrix</span>
+0090     W_b = -Kp*[W_A [-n{idx}.'*c{idx}; 0; 0]];
+0091     <span class="comment">% Definition of Constraint matrix and main task</span>
+0092     A = @(x) W_A*feval(Phi_A,x); <span class="comment">% Constraint matrix as a function of configuration</span>
+0093     b = @(x) W_b*feval(Phi_b,x); <span class="comment">% main task as a function of the configuration</span>
+0094     <span class="comment">% Constrained Policie</span>
+0095     Phi{idx} = <a href="../../Functions/regressors/def_phi_4_cwm_sim.html" class="code" title="function functionHandle = def_phi_4_cwm_sim(robotHandle, c_G, radius)">def_phi_4_cwm_sim</a>(robot, c{idx}, r{idx}); <span class="comment">% Get regressors for the unconstrained policy</span>
+0096     unconstrainedPolicy{idx} = @(x) Phi{idx}(x)*[1; 10];
+0097     x_dot = <a href="../../Functions/subfunctions/def_constrained_policy.html" class="code" title="function functionHandle = def_constrained_policy(constraintMatrix, task, unconstrainedPolicy)">def_constrained_policy</a>(A, b, unconstrainedPolicy{idx});
+0098     <span class="comment">% solving motion</span>
+0099     sol = ode113(@(t,x) x_dot(x),[0 tf], x0);
+0100     [traj, dtraj] = deval(sol,time); <span class="comment">% evaluation of solution</span>
+0101     <span class="comment">% store data</span>
+0102     x{idx} = num2cell(traj(:,timecond),1);
+0103     u{idx} = num2cell(dtraj(:,timecond),1);
+0104     timeprov = time(timecond); timeprov = timeprov - timeprov(1);
+0105     t{idx} = num2cell(timeprov,1);
+0106     <span class="comment">% computation for plot purposes</span>
+0107     p{idx}=transl(robot.fkine(traj(:,timecond).'));
+0108     disp(idx);
+0109 <span class="keyword">end</span>
+0110 <span class="comment">%--------------------------------------------------------------------------</span>
+0111 <span class="comment">%--------------------------------------------------------------------------</span>
+0112 
+0113 <span class="comment">%% Save data to file</span>
+0114 <span class="comment">%--------------------------------------------------------------------------</span>
+0115 <span class="comment">%--------------------------------------------------------------------------</span>
+0116 save(<span class="string">'data_simulated.mat'</span>,<span class="string">'x'</span>,<span class="string">'u'</span>,<span class="string">'t'</span>);
+0117 <span class="comment">%--------------------------------------------------------------------------</span>
+0118 <span class="comment">%--------------------------------------------------------------------------</span>
+0119 
+0120 <span class="comment">%% Plot end-effector positions</span>
+0121 <span class="comment">%--------------------------------------------------------------------------</span>
+0122 <span class="comment">%--------------------------------------------------------------------------</span>
+0123 fprintf(1,<span class="string">'Plotting Results...\n'</span>);
+0124 figure();
+0125 <span class="keyword">for</span> idx=1:NDem
+0126     <span class="comment">% plot</span>
+0127     subplot(3,4,idx);
+0128     plot3(c{idx}(1),c{idx}(2),c{idx}(3),<span class="string">'*g'</span>); hold on;
+0129     plot3(p{idx}(:,1),p{idx}(:,2),p{idx}(:,3),<span class="string">'*r'</span>);
+0130     <a href="../../Functions/subfunctions/plotCircle3D.html" class="code" title="function plotCircle3D(center,radius,normal)">plotCircle3D</a>(c{idx},r{idx},n{idx});
+0131     xlabel(<span class="string">'x'</span>); ylabel(<span class="string">'y'</span>); zlabel(<span class="string">'z'</span>);
+0132     legend(<span class="string">'centre'</span>,<span class="string">'data'</span>,<span class="string">'circle'</span>);
+0133     axis equal;
+0134 <span class="keyword">end</span>
+0135 <span class="comment">%--------------------------------------------------------------------------</span>
+0136 <span class="comment">%--------------------------------------------------------------------------</span>
+0137 
+0138 <span class="comment">%% Remove path</span>
+0139 <span class="comment">%--------------------------------------------------------------------------</span>
+0140 <span class="comment">%--------------------------------------------------------------------------</span>
+0141 rmpath(genpath(<span class="string">'../'</span>));
+0142 <span class="comment">%--------------------------------------------------------------------------</span>
+0143 <span class="comment">%--------------------------------------------------------------------------</span></pre></div>
+<hr><address>Generated on Mon 30-Oct-2017 17:46:26 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

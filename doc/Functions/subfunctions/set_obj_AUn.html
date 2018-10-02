@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of set_obj_AUn</title>
+  <meta name="keywords" content="set_obj_AUn">
+  <meta name="description" content="[fun] = obj_AUn (model, W, BX, RnUn)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">subfunctions</a> &gt; set_obj_AUn.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions/subfunctions&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>set_obj_AUn
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[fun] = obj_AUn (model, W, BX, RnUn)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [fun] = set_obj_AUn (model, W, BX, RnUn) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [fun] = obj_AUn (model, W, BX, RnUn)
+ Objective funtion: minimise (A * Un)^2
+
+ Input:
+   model                                Model related parameteres
+   W                                    Weights of parametric model
+   BX                                   Higher dimensional representation of X using gaussian kernel
+   RnUn                                 RnUn=Rn*Un
+ Output:
+   fun                                  Returned objective function handle</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="get_unit_vector_from_matrix.html" class="code" title="function alpha = get_unit_vector_from_matrix (Theta)">get_unit_vector_from_matrix</a>	alpha = get_unit_vector_from_matrix (Theta)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="search_alpha.html" class="code" title="function model = search_alpha (BX, RnUn, model)">search_alpha</a>	model = search_alpha (BX, RnUn, model)</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [fun] = set_obj_AUn (model, W, BX, RnUn)</a>
+0002 <span class="comment">% [fun] = obj_AUn (model, W, BX, RnUn)</span>
+0003 <span class="comment">% Objective funtion: minimise (A * Un)^2</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Input:</span>
+0006 <span class="comment">%   model                                Model related parameteres</span>
+0007 <span class="comment">%   W                                    Weights of parametric model</span>
+0008 <span class="comment">%   BX                                   Higher dimensional representation of X using gaussian kernel</span>
+0009 <span class="comment">%   RnUn                                 RnUn=Rn*Un</span>
+0010 <span class="comment">% Output:</span>
+0011 <span class="comment">%   fun                                  Returned objective function handle</span>
+0012 
+0013 dim_n   = size(BX,2) ;
+0014 W       = reshape(W, model.dim_u-model.dim_k, model.dim_b );
+0015 fun     = zeros(dim_n, 1) ;
+0016 theta   = [pi/2*ones(dim_n, (model.dim_k-1)), (W * BX)' ] ;
+0017 alpha   = <a href="get_unit_vector_from_matrix.html" class="code" title="function alpha = get_unit_vector_from_matrix (Theta)">get_unit_vector_from_matrix</a>(theta) ;
+0018 <span class="keyword">for</span> n   = 1 : dim_n
+0019     fun(n)  = alpha(n,:) * RnUn(:,n) ;
+0020 <span class="keyword">end</span>
+0021 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 30-Oct-2017 17:46:26 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

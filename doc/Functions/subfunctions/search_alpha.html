@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of search_alpha</title>
+  <meta name="keywords" content="search_alpha">
+  <meta name="description" content="model = search_alpha (BX, RnUn, model)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">subfunctions</a> &gt; search_alpha.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions/subfunctions&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>search_alpha
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>model = search_alpha (BX, RnUn, model)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function model = search_alpha (BX, RnUn, model) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> model = search_alpha (BX, RnUn, model)
+
+ Learning the constraint vector
+   Input:
+       BX                          Higher dimensional representation of X using gaussian kernel
+       RnUn                        RnUn=Rn*Un
+       model                       Model learnt from the last iteration
+   Output
+       model                       Updated model with the k^th constraint</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="set_obj_AUn.html" class="code" title="function [fun] = set_obj_AUn (model, W, BX, RnUn)">set_obj_AUn</a>	[fun] = obj_AUn (model, W, BX, RnUn)</li><li><a href="solve_lm.html" class="code" title="function [xf, S, msg] = solve_lm (varargin)">solve_lm</a>	[xf, S, msg] = solve_lm (varargin)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../Functions/learn_constraint/learn_alpha_ccl.html" class="code" title="function [optimal] = learn_alpha_ccl (Un, X, options)">learn_alpha_ccl</a>	[optimal] = learn_alpha_ccl (Un, X, options)</li><li><a href="../../Functions/learn_constraint/learn_lambda_ccl.html" class="code" title="function [optimal] = learn_lambda_ccl (Un, X, J, options)">learn_lambda_ccl</a>	[optimal] = learn_lambda_ccl (Un, X, J, options)</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function model = search_alpha (BX, RnUn, model)</a>
+0002 <span class="comment">% model = search_alpha (BX, RnUn, model)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Learning the constraint vector</span>
+0005 <span class="comment">%   Input:</span>
+0006 <span class="comment">%       BX                          Higher dimensional representation of X using gaussian kernel</span>
+0007 <span class="comment">%       RnUn                        RnUn=Rn*Un</span>
+0008 <span class="comment">%       model                       Model learnt from the last iteration</span>
+0009 <span class="comment">%   Output</span>
+0010 <span class="comment">%       model                       Updated model with the k^th constraint</span>
+0011 
+0012 <span class="comment">%options.MaxFunEvals = 1e6 ;</span>
+0013 options.MaxIter     = 1000 ;
+0014 options.TolFun      = 1e-6 ;
+0015 options.TolX        = 1e-6 ;
+0016 options.Jacobian    = 0 ;
+0017 
+0018 obj                 = @(W) <a href="set_obj_AUn.html" class="code" title="function [fun] = set_obj_AUn (model, W, BX, RnUn)">set_obj_AUn</a> (model, W, BX, RnUn) ;   <span class="comment">% setup the learning objective function</span>
+0019 model.nmse          = 10000000 ;
+0020 <span class="keyword">for</span> i = 1:1 <span class="comment">% normally, the 1 attempt is enough to find the solution. Repeat the process if the process tends to find local minimum (i.e., for i = 1:5)</span>
+0021     W    = rand(1, (model.dim_u-model.dim_k)* model.dim_b) ; <span class="comment">% make a random guess for initial value</span>
+0022     W    = <a href="solve_lm.html" class="code" title="function [xf, S, msg] = solve_lm (varargin)">solve_lm</a> (obj, W, options );                      <span class="comment">% use a non-linear optimiser to solve obj</span>
+0023     nmse = mean(obj(W).^2) / model.var ;
+0024     fprintf(<span class="string">'\t K=%d, iteration=%d, residual error=%4.2e\n'</span>, model.dim_k, i, nmse) ;
+0025     <span class="keyword">if</span> model.nmse &gt; nmse
+0026         model.w{model.dim_k}= reshape(W, model.dim_u-model.dim_k, model.dim_b) ;
+0027         model.nmse          = nmse ;
+0028     <span class="keyword">end</span>
+0029     <span class="keyword">if</span> model.nmse &lt; 1e-5 <span class="comment">% restart a random initial weight if residual error is higher than 10^-5</span>
+0030         <span class="keyword">break</span>
+0031     <span class="keyword">end</span>
+0032 <span class="keyword">end</span>
+0033 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 30-Oct-2017 17:46:26 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

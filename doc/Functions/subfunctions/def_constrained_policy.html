@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of def_constrained_policy</title>
+  <meta name="keywords" content="def_constrained_policy">
+  <meta name="description" content="Defines a constrained policy given the unconstrained policy and the constraint.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">Functions</a> &gt; <a href="index.html">subfunctions</a> &gt; def_constrained_policy.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for Functions/subfunctions&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>def_constrained_policy
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Defines a constrained policy given the unconstrained policy and the constraint.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function functionHandle = def_constrained_policy(constraintMatrix, task, unconstrainedPolicy) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Defines a constrained policy given the unconstrained policy and the constraint.
+
+ Consider the decomposition of the robot actions as a main task and
+ a secondary task in the null space of the main:
+
+       u(x) = pinv(A(x)) * b(x) + (I - pinv(A(x)) * A(x)) * u_pi(x),
+       
+ where x is the state (robot configuration), A(x) a Pfaffian constraint matrix,
+ and u_pi(x) is the unconstrained policy for the secondary task.
+ def_constrained_policy returns a MatLab function handle to the unconstrained
+ policy u(x), given A(x), b(x), and u_pi(x).
+
+ Syntax: def_constrained_policy(constraintMatrix, task, unconstrainedPolicy)
+
+ Inputs:
+    constraintMatrix - MatLab function handle to constraint Matrix;
+    task - MatLab function handle to the main task;
+    unconstrainedPolicy - MatLab handle to the unconstrainde policy.
+
+ Outputs:
+    functionHandle - MatLab function handle with robot configuration 
+                     (column vector) as input
+
+ Example: 
+     % Robot Kinematic model specified by the Denavit-Hartenberg:
+     DH = [0.0, 0.31, 0.0, pi/2;
+           0.0, 0.0, 0.0, -pi/2;
+           0.0, 0.4, 0.0, -pi/2;
+           0.0, 0.0, 0.0, pi/2;
+           0.0, 0.39, 0.0, pi/2;
+           0.0, 0.0, 0.0, -pi/2;
+           0.0, 0.21-0.132, 0.0, 0.0];
+     % Peters Cork robotics library has to be installed:
+     robot = SerialLink(DH);
+     % Phi_A(x): vector of regressors for the Constraint matrix as a function
+     % of the state
+     n = [0; 0; 1]; % Cartesian normal of the constraint surface.
+     W_A = blkdiag(n.', n.', n.'); % Constant gain matrix for the Constraint matrix.
+     Phi_A = def_phia_4_spm(robot);
+     % Constraint matrix as a function of configuration.
+     A = @(x) W_A*PhiA(x);
+     % Phi_b(x): vector of regressors for the main task as a function of the
+     % state:
+     Phi_b = def_phib_4_spm_sim(robot);
+     % Main task as a function of the configuration:
+     b = @(x) W_b*Phi_b(x);
+     % Defining unconstrained policy regressors:
+     centre = [0.1; 0.0; 0.4];
+     radius = 0.02;
+     Phi = def_phi_4_cwm(robot, centre, radius);
+     % Defining unconstrained policy:
+     u_pi = @(x) Phi(x)*[1 10];
+     % Defining constrained policy
+     pi = def_constrained_policy(A, b, u_pi);
+     % Constrained policy for given robot arm configuration:
+     x = [0;0;0;pi/2;0;-pi/2;0];
+     disp(pi(x));</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="../../Functions/data_generation/generate_data_kuka_wiping.html" class="code" title="">generate_data_kuka_wiping</a>	Generates states (robot joint positions) and actions (robot joint velocities)</li><li><a href="../../Functions/data_generation/test.html" class="code" title="">test</a>	Generates states (robot joint positions) and actions (robot joint velocities)</li><li><a href="../../Functions/demos/demo_kuka_wiping.html" class="code" title="">demo_kuka_wiping</a>	Given the data composed of states - joint positions - and actions - joint</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">functionHandle = @constrainedPolicy;</a></li><li><a href="#_sub2" class="code">function output = constrainedPolicy(q)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function functionHandle = def_constrained_policy(constraintMatrix, task, unconstrainedPolicy)</a>
+0002 <span class="comment">% Defines a constrained policy given the unconstrained policy and the constraint.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Consider the decomposition of the robot actions as a main task and</span>
+0005 <span class="comment">% a secondary task in the null space of the main:</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%       u(x) = pinv(A(x)) * b(x) + (I - pinv(A(x)) * A(x)) * u_pi(x),</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% where x is the state (robot configuration), A(x) a Pfaffian constraint matrix,</span>
+0010 <span class="comment">% and u_pi(x) is the unconstrained policy for the secondary task.</span>
+0011 <span class="comment">% def_constrained_policy returns a MatLab function handle to the unconstrained</span>
+0012 <span class="comment">% policy u(x), given A(x), b(x), and u_pi(x).</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% Syntax: def_constrained_policy(constraintMatrix, task, unconstrainedPolicy)</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% Inputs:</span>
+0017 <span class="comment">%    constraintMatrix - MatLab function handle to constraint Matrix;</span>
+0018 <span class="comment">%    task - MatLab function handle to the main task;</span>
+0019 <span class="comment">%    unconstrainedPolicy - MatLab handle to the unconstrainde policy.</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% Outputs:</span>
+0022 <span class="comment">%    functionHandle - MatLab function handle with robot configuration</span>
+0023 <span class="comment">%                     (column vector) as input</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% Example:</span>
+0026 <span class="comment">%     % Robot Kinematic model specified by the Denavit-Hartenberg:</span>
+0027 <span class="comment">%     DH = [0.0, 0.31, 0.0, pi/2;</span>
+0028 <span class="comment">%           0.0, 0.0, 0.0, -pi/2;</span>
+0029 <span class="comment">%           0.0, 0.4, 0.0, -pi/2;</span>
+0030 <span class="comment">%           0.0, 0.0, 0.0, pi/2;</span>
+0031 <span class="comment">%           0.0, 0.39, 0.0, pi/2;</span>
+0032 <span class="comment">%           0.0, 0.0, 0.0, -pi/2;</span>
+0033 <span class="comment">%           0.0, 0.21-0.132, 0.0, 0.0];</span>
+0034 <span class="comment">%     % Peters Cork robotics library has to be installed:</span>
+0035 <span class="comment">%     robot = SerialLink(DH);</span>
+0036 <span class="comment">%     % Phi_A(x): vector of regressors for the Constraint matrix as a function</span>
+0037 <span class="comment">%     % of the state</span>
+0038 <span class="comment">%     n = [0; 0; 1]; % Cartesian normal of the constraint surface.</span>
+0039 <span class="comment">%     W_A = blkdiag(n.', n.', n.'); % Constant gain matrix for the Constraint matrix.</span>
+0040 <span class="comment">%     Phi_A = def_phia_4_spm(robot);</span>
+0041 <span class="comment">%     % Constraint matrix as a function of configuration.</span>
+0042 <span class="comment">%     A = @(x) W_A*PhiA(x);</span>
+0043 <span class="comment">%     % Phi_b(x): vector of regressors for the main task as a function of the</span>
+0044 <span class="comment">%     % state:</span>
+0045 <span class="comment">%     Phi_b = def_phib_4_spm_sim(robot);</span>
+0046 <span class="comment">%     % Main task as a function of the configuration:</span>
+0047 <span class="comment">%     b = @(x) W_b*Phi_b(x);</span>
+0048 <span class="comment">%     % Defining unconstrained policy regressors:</span>
+0049 <span class="comment">%     centre = [0.1; 0.0; 0.4];</span>
+0050 <span class="comment">%     radius = 0.02;</span>
+0051 <span class="comment">%     Phi = def_phi_4_cwm(robot, centre, radius);</span>
+0052 <span class="comment">%     % Defining unconstrained policy:</span>
+0053 <span class="comment">%     u_pi = @(x) Phi(x)*[1 10];</span>
+0054 <span class="comment">%     % Defining constrained policy</span>
+0055 <span class="comment">%     pi = def_constrained_policy(A, b, u_pi);</span>
+0056 <span class="comment">%     % Constrained policy for given robot arm configuration:</span>
+0057 <span class="comment">%     x = [0;0;0;pi/2;0;-pi/2;0];</span>
+0058 <span class="comment">%     disp(pi(x));</span>
+0059 
+0060 <span class="comment">% Author: Joao Moura</span>
+0061 <span class="comment">% Edinburgh Centre for Robotics, Edinburgh, UK</span>
+0062 <span class="comment">% email address: Joao.Moura@ed.ac.uk</span>
+0063 <span class="comment">% Website: http://www.edinburgh-robotics.org/students/joao-moura</span>
+0064 <span class="comment">% October 2017; Last revision: 29-Oct-2017</span>
+0065 
+0066 <span class="comment">%------------- BEGIN CODE --------------</span>
+0067 <a name="_sub1" href="#_subfunctions" class="code">functionHandle = @constrainedPolicy; </a><span class="comment">% Return handle of constrained policy.</span>
+0068 <a name="_sub2" href="#_subfunctions" class="code">function output = constrainedPolicy(q)</a>
+0069     A = constraintMatrix(q); <span class="comment">% Compute constraint matrix for given configuration.</span>
+0070     Ainv = pinv(A); <span class="comment">% Pseudo inverse of constraint matrix.</span>
+0071     N = eye(length(q)) - Ainv*A; <span class="comment">% Compute null-space projection matrix for given configuration.</span>
+0072     b = task(q); <span class="comment">% Compute task vector for given configuration.</span>
+0073     pi = unconstrainedPolicy(q); <span class="comment">% Compute unconstrained policy.</span>
+0074     output = Ainv*b + N*pi; <span class="comment">% Output constrained policy.</span>
+0075 <span class="keyword">end</span>
+0076 <span class="comment">%------------- END OF CODE --------------</span>
+0077 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 30-Oct-2017 17:46:26 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>
