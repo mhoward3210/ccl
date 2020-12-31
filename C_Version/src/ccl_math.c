@@ -420,7 +420,6 @@ void nround (const double *n,int size,unsigned int c,double *ret){
 void generate_kmeans_centres(const double * X,const int dim_x,const int dim_n,const int dim_b,double * centres){
     int i,N, iter,k,num_ix,num_empty_clusters;
     int* ind_,*empty_clusters,*minDi,*ix;
-    size_t *sDi;
     double * M, * D,*minDv,*X_ix,*X_ix_m,*X_ink,*sDv;
     double dist_old, dist_new;
     dist_old = 10000;
@@ -447,7 +446,7 @@ void generate_kmeans_centres(const double * X,const int dim_x,const int dim_n,co
     minDv = malloc(dim_n*sizeof(double));
     minDi = malloc(dim_n*sizeof(int));
     sDv   = malloc(dim_n*sizeof(double));
-    sDi   = malloc(dim_n*sizeof(int));
+    size_t *sDi   = malloc(dim_n*sizeof(size_t));
     ix    = malloc(dim_n*sizeof(int));
     X_ix_m= malloc(dim_x*1*sizeof(double));
     X_ink = malloc(dim_x*sizeof(double));
