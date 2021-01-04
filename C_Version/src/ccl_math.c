@@ -480,8 +480,7 @@ void generate_kmeans_centres(const double * X,const int dim_x,const int dim_n,co
         dist_new = ccl_vec_sum(minDv,dim_n);
         if (num_empty_clusters == 0){
             if(fabs(dist_old-dist_new)<1E-10) {
-                memcpy(centres,M,dim_x*dim_b*sizeof(double));
-                return;
+                break;
             }
         }
         else{
